@@ -1,4 +1,4 @@
-window.localStorage.clear();
+// window.localStorage.clear();
 // Save the polygon when editing is finish
 
 var width;
@@ -11,7 +11,8 @@ var dataset;
 var current_class;
 var current_class_css;
 var editing_layer;
-var images_list = Array('158465s995ms.jpg', 'logo_Jakarto.jpg')  // Get this list from a server side.
+
+var images_list;
 var img = new Image();
 
 var map = L.map('map', { editable: true }).setView([0.0, 0.0], 11);
@@ -62,17 +63,35 @@ function save_polygon(e) {
             data = data.features[0]
         }
 
-        for (index_point in data.geometry.coordinates[0]) {
-            var [x, y] = data.geometry.coordinates[0][index_point];
-            var x_in_image = Math.round(x / scaling)
-            var y_in_image = Math.round(y / scaling)
-            data.geometry.coordinates[0][index_point] = Array(x_in_image, height - y_in_image)
+        // Check if first coordinate is different from undefined. I dont know why, but Leaflet.Editable deleteShapeAt function doesn't delete enterely the polygon...
+        if (data.geometry.coordinates[0][0] !== undefined){  
+            if (data.geometry.coordinates[0] !== undefined){
+                for (index_point in data.geometry.coordinates[0]) {
+                    var [x, y] = data.geometry.coordinates[0][index_point];
+                    var x_in_image = Math.round(x / scaling)
+                    var y_in_image = Math.round(y / scaling)
+                    data.geometry.coordinates[0][index_point] = Array(x_in_image, height - y_in_image)
+                }
+                dataset[img.src].push(data);
+            }
         }
 
-        dataset[img.src].push(data);
     });
 
     window.localStorage.setItem("dataset", JSON.stringify(dataset));
+
+    var url_mask = `/masks/${images_list[index_image]}`
+    $.ajax({
+        url: url_mask,
+        type: 'POST',
+        data: JSON.stringify(dataset[img.src]),
+        contentType: 'application/json',
+    }).done(function () {
+        socket.emit('send_a_new_json', images_list[index_image]);
+    }).fail(function (msg) {
+        console.log('Problème de synchronisation...');
+    });
+
 }
 
 map.on('editable:drawing:end', function (e) {
@@ -98,6 +117,12 @@ map.on('editable:vertex:dragend', function (e) {
 });
 
 map.on('editable:dragend', function (e) {
+    save_polygon(e)
+});
+map.on('editable:vertex:deleted', function (e) {
+    save_polygon(e)
+});
+map.on('editable:shape:deleted', function (e) {
     save_polygon(e)
 });
 
@@ -162,7 +187,7 @@ window.onkeydown = function (event) {
 
 var deleteShape = function (e) {
     if ((e.originalEvent.ctrlKey || e.originalEvent.metaKey) && this.editEnabled()) {
-        console.log(this.feature.properties);
+        this.editor.deleteShapeAt(e.latlng);
     }
 };
 
@@ -173,7 +198,6 @@ map.on('layeradd', function (e) {
         map.editTools.featuresLayer.getLayers().forEach(function (l) {
             if (l instanceof L.LayerGroup) {
                 l.getLayers().forEach(function (layer) {
-                    // console.log(l.getLayers());
                     if (layer.editEnabled() && layer !== e.layer) {
                         layer.toggleEdit();
                     }
@@ -208,76 +232,101 @@ map.on('layeradd', function (e) {
     });
 });
 
+var display_polygons = function(){
+    var url_mask = `/masks/${images_list[index_image]}`
+    $.ajax({
+        url: url_mask,
+        type: 'GET',
+        success: function (data) {
+            map.editTools.featuresLayer.clearLayers();
+            map.editTools.editLayer.clearLayers();
+            if (window.localStorage["dataset"] === undefined) {
+                dataset = {};
+            } else {
+                dataset = JSON.parse(window.localStorage["dataset"]);
+            }
 
-img.onload = function () {
-    width = this.width;
-    height = this.height;
+            if (dataset[img.src] === undefined) {
+                dataset[img.src] = [];
+            }
+            dataset[img.src] = JSON.parse(data);
+            for (index_geojsonFeature in dataset[img.src]) {
+                geojsonFeature = dataset[img.src][index_geojsonFeature];
+                for (index_point in geojsonFeature.geometry.coordinates[0]) {
 
-    if (this.height > this.width) {
-        new_height = parseFloat("0." + height)
-        scaling = new_height / height
-        new_width = width * scaling
-    } else {
-        new_width = parseFloat("0." + width)
-        scaling = new_width / width
-        new_height = height * scaling
-    }
+                    var [x, y] = geojsonFeature.geometry.coordinates[0][index_point];
+                    var x_in_geo = x * scaling
+                    var y_in_geo = (height - y) * scaling
+                    geojsonFeature.geometry.coordinates[0][index_point] = Array(x_in_geo, y_in_geo);
+                }
 
-    var imageBounds = [[0.0, 0.0], [new_height, new_width]];
-    image = L.imageOverlay(this.src, imageBounds).addTo(map);
-    map.setView(new L.LatLng(new_height / 2, new_width / 2))
+                L.geoJSON(geojsonFeature).addTo(map.editTools.featuresLayer).getLayers().forEach(function (l) {
+                    l.enableEdit();
+                    l.toggleEdit();
 
+                    var feature = l.feature = l.feature || {}; // Initialize feature
+                    feature.type = feature.type || "Feature"; // Initialize feature.type
+                    var props = feature.properties = feature.properties || {}; // Initialize feature.properties
+                    props.class_css = props.class_css = props.class_css || "color-default"
 
-    var bounds = L.latLngBounds([0.0, 0.0], [new_height, new_width]);
+                    var elem = document.querySelector("." + props.class_css);
+                    var style = getComputedStyle(elem);
+                    l.setStyle({ fillColor: style.color });
+                }
+                );
+            }
 
-    map.setMaxBounds(bounds);
-    map.fitBounds(bounds);
-    map.panInsideBounds(bounds, { animate: false });
-    map.dragging.enable();
-    map.on('drag', function () {
-        map.panInsideBounds(bounds, { animate: false });
+            console.log("found : " + dataset[img.src].length + ' existing polygon for this image')
+        }
     });
-
-    map.editTools.featuresLayer.clearLayers();
-    map.editTools.editLayer.clearLayers();
-
-    if (window.localStorage["dataset"] === undefined) {
-        dataset = {};
-    } else {
-        dataset = JSON.parse(window.localStorage["dataset"]);
-    }
-
-    if (dataset[img.src] === undefined) {
-        dataset[img.src] = [];
-    }
-    for (index_geojsonFeature in dataset[img.src]) {
-        geojsonFeature = dataset[img.src][index_geojsonFeature];
-        for (index_point in geojsonFeature.geometry.coordinates[0]) {
-
-            var [x, y] = geojsonFeature.geometry.coordinates[0][index_point];
-            var x_in_geo = x * scaling
-            var y_in_geo = (height - y) * scaling
-            geojsonFeature.geometry.coordinates[0][index_point] = Array(x_in_geo, y_in_geo);
-        }
-
-        L.geoJSON(geojsonFeature).addTo(map.editTools.featuresLayer).getLayers().forEach(function (l) {
-            l.enableEdit();
-            l.toggleEdit();
-
-            var feature = l.feature = l.feature || {}; // Initialize feature
-            feature.type = feature.type || "Feature"; // Initialize feature.type
-            var props = feature.properties = feature.properties || {}; // Initialize feature.properties
-            props.class_css = props.class_css = props.class_css || "color-default"
-
-            var elem = document.querySelector("." + props.class_css);
-            var style = getComputedStyle(elem);
-            l.setStyle({ fillColor: style.color });
-        }
-        );
-    }
-
-    console.log("found : " + dataset[img.src].length + ' existing polygon for this image')
 }
+
+var socket = io();
+socket.on('connect', function () {
+    img.onload = function () {
+
+            socket.emit('room-join', images_list[index_image]);
+            
+            
+            width = this.width;
+            height = this.height;
+            
+            if (this.height > this.width) {
+                new_height = parseFloat("0." + height)
+                scaling = new_height / height
+                new_width = width * scaling
+            } else {
+                new_width = parseFloat("0." + width)
+                scaling = new_width / width
+                new_height = height * scaling
+            }
+            
+            var imageBounds = [[0.0, 0.0], [new_height, new_width]];
+            image = L.imageOverlay(this.src, imageBounds).addTo(map);
+            map.setView(new L.LatLng(new_height / 2, new_width / 2))
+            
+            
+            var bounds = L.latLngBounds([0.0, 0.0], [new_height, new_width]);
+            
+            map.setMaxBounds(bounds);
+            map.fitBounds(bounds);
+            map.panInsideBounds(bounds, { animate: false });
+            map.dragging.enable();
+            map.on('drag', function () {
+                map.panInsideBounds(bounds, { animate: false });
+            });
+            
+            map.editTools.featuresLayer.clearLayers();
+            map.editTools.editLayer.clearLayers();
+            
+            display_polygons();
+    
+    }
+    
+    socket.on('should_refresh_json', function (data) {
+        display_polygons();
+    })
+});
 var index_image;
 index_image = parseInt(window.localStorage["index_image"]) || 0;
 
@@ -285,24 +334,28 @@ index_image = parseInt(window.localStorage["index_image"]) || 0;
 document.getElementById("next").addEventListener("click", function (e) {
     map.dragging.disable();
     map.off('drag');
+    socket.emit('room-leave', images_list[index_image]);
+
     index_image = index_image + 1;
     if (index_image >= images_list.length) {
         index_image = 0;
     }
     map.removeLayer(image);
-    img.src = 'images/' + images_list[index_image];
+    img.src = '/data/images/' + images_list[index_image];
     window.localStorage.setItem("index_image", index_image);
 })
 
 document.getElementById("previous").addEventListener("click", function (e) {
     map.dragging.disable();
     map.off('drag');
+    socket.emit('room-leave', images_list[index_image]);
+
     index_image = index_image - 1;
     if (index_image < 0) {
         index_image = images_list.length - 1;
     }
     map.removeLayer(image);
-    img.src = 'images/' + images_list[index_image];
+    img.src = '/data/images/' + images_list[index_image];
     window.localStorage.setItem("index_image", index_image);
 })
 
@@ -335,16 +388,11 @@ $treeview
         $("#selected").text(current_class)
         $treeview.jstree('open_all');
         $treeview.on("changed.jstree", function (e, data) {
-            // console.log(e);
-            // console.log(data);
             current_class = $treeview.jstree("get_selected", true)[0].text
             current_class_css = $treeview.jstree("get_selected", true)[0].li_attr.class
             $("#selected").text(current_class)
 
             if (editing_layer){
-                console.log("Will modify category")
-                console.log(editing_layer)
-                // console.log(editing_layer)
                 var layer = editing_layer,
                     feature = layer.feature = layer.feature || {}; // Initialize feature
 
@@ -359,10 +407,21 @@ $treeview
                 save_polygon(e)
             }
         });
-        img.src = 'images/' + images_list[index_image];
+        $.ajax({
+            url: "/images",
+            type: 'GET',
+            success: function (data) {
+                images_list = JSON.parse(data);
+                img.src = '/data/images/' + images_list[index_image];
+            }
+        })
     })
+    .bind("loaded.jstree", function (event, data) {
+        $("#tree li a").addTouch();
+    });
 
 
 document.getElementById("expand_all").addEventListener("click", function (e) {
     $treeview.jstree('open_all');
 })
+
