@@ -372,6 +372,7 @@ $treeview
                 { "id": "2", "parent": "#", "text": "Végétation", "li_attr": { "class": "color-vegetation" } },
                 { "id": "2.1", "parent": "2", "text": "Arbre", "li_attr": { "class": "color-vegetation" } },
                 { "id": "2.2", "parent": "2", "text": "Nature", "li_attr": { "class": "color-vegetation" } },
+                { "id": "3", "parent": "#", "text": "People", "li_attr": { "class": "color-human" } },
             ],
             "multiple": false,
         },
