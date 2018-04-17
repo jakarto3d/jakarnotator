@@ -1,1 +1,3 @@
 jakarnotator/node_modules
+jakarnotator/public/data/images/*
+jakarnotator/public/data/masks/*
