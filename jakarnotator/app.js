@@ -8,6 +8,7 @@ var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 var masksRouter = require("./routes/masks");
 var imagesRouter = require("./routes/images");
+var processRouter = require("./routes/process");
 
 var app = express();
 
@@ -25,6 +26,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/masks", masksRouter);
 app.use("/images", imagesRouter);
+app.use("/process", processRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

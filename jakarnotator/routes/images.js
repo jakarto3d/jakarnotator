@@ -8,9 +8,9 @@ router.use(bodyParser.urlencoded({ extended: true }));  // parse application/x-w
 var fs = require("fs");
 
 /* GET users listing. */
-router.get("/", function(req, res, next) {
-  var testFolder = 'public/data/images'
-  fs.readdir(testFolder, (err, files) => {
+router.get("/", function (req, res, next) {
+  var imageFolder = 'public/data/images'
+  fs.readdir(imageFolder, (err, files) => {
     res.json(JSON.stringify(files));
   })
 });
