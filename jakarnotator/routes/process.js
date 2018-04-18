@@ -34,16 +34,16 @@ function update_category_counter(image_basename, category) {
 }
 
 /* GET users listing. */
-router.get("/", function(req, res, next) {
+router.get("/", function (req, res, next) {
   res.send("respond with a resource");
 });
 
-router.get("/reset", function(req, res, next) {
+router.get("/reset", function (req, res, next) {
   reset_category_counter();
   res.send("respond with a resource");
 });
 
-router.get("/reset/:image_name", function(req, res) {
+router.get("/reset/:image_name", function (req, res) {
   var image_name = req.params.image_name;
   var mask = `public/data/masks/${image_name}.json`;
   var image_basename = image_name.replace(/\.[^/.]+$/, "");
@@ -56,22 +56,27 @@ router.get("/spliter/:image_name", (req, res) => {
   var image_name = req.params.image_name;
   var mask = `public/data/masks/${image_name}.json`;
   var image_basename = image_name.replace(/\.[^/.]+$/, "");
-  
+
+  var c = 0;
+
   reset_category_counter(image_basename);
   fs.readFile(mask, "utf8", function (err, data) {
     if (err) throw err;
     var data_array = JSON.parse(data);
-    data_array.forEach(function(item){
+    data_array.forEach(function (item) {
       var category = item.properties.category;
       var index = update_category_counter(image_basename, category);
       var filename = `${image_basename}_${category}_${index}`
       var path = `public/data/process/masks/geojson/${filename}.geojson`;
       fs.writeFile(path, JSON.stringify(item), function (err) {
+        c++;
         if (err) throw err;
         console.log(`${filename} created`);
+        if (c == data_array.length) {
+          return res.send("respond with a resource");
+        }
       });
     })
-    res.send("respond with a resource");
   });
 });
 
@@ -81,40 +86,37 @@ router.get("/maskconverter/tif/:image_name", (req, res) => {
   var image_basename = image_name.replace(/\.[^/.]+$/, "");
   var image_path = `public/data/images/${image_name}`;
 
+  var c = 0;
   // get size of the image
   var image = new Jimp(image_path, function (err, image) {
     var w = image.bitmap.width; // the width of the image
     var h = image.bitmap.height; // the height of the image
     // console.log(w, h);
-    
+
     // get all masks geojson to transform
     glob(`public/data/process/masks/geojson/${image_basename}*.geojson`, function (er, files) {
-      files.forEach(function(file){
+      files.forEach(function (file) {
         // console.log(file);
         var file_basename = file.replace(/.*\//, "")  // Remove all the thing before the last slash (server url & api)
-                                .replace(/\.[^/.]+$/, "")  // Remove all the thing after the last . (extension)
-        
+          .replace(/\.[^/.]+$/, "")  // Remove all the thing after the last . (extension)
+
         // console.log(file_basename);
         var output_file = `public/data/process/masks/tif/${file_basename}.tif`
         // call gdal
         var gdal_command = `gdal_rasterize.exe -burn 255 -burn 255 -burn 255 -ts ${w} ${h} -te 0 0 ${w} ${h} "${file}" "${output_file}"`
         // console.log(gdal_command)
         var gdal = spawn(gdal_command, [], { shell: true });
-        // gdal.stdout.on('data', (data) => {
-        //   console.log(`stdout: ${data}`);
-        // });
-        // gdal.stderr.on('data', (data) => {
-        //   console.log(`stderr: ${data}`);
-        // });
-        gdal.on('close', function(code){
+
+        gdal.on('close', function (code) {
+          c++;
           console.log(`child process exited with code ${code}`);
+          if (c == files.length) {
+            return res.send("respond with a resource");
+          }
         })
       })
     })
   });
-  res.send("respond with a resource");
-
-
 });
 
 
@@ -122,13 +124,14 @@ router.get("/maskconverter/png/:image_name", (req, res) => {
   var image_name = req.params.image_name;
   var image_basename = image_name.replace(/\.[^/.]+$/, "");
   var image_path = `public/data/images/${image_name}`;
-  
+  var c = 0;
+
   // get all masks geojson to transform
   glob(`public/data/process/masks/tif/${image_basename}*.tif`, function (er, files) {
     files.forEach(function (file) {
       var file_basename = file.replace(/.*\//, "")  // Remove all the thing before the last slash (server url & api)
-      .replace(/\.[^/.]+$/, "")  // Remove all the thing after the last . (extension)
-      
+        .replace(/\.[^/.]+$/, "")  // Remove all the thing after the last . (extension)
+
       // console.log(file_basename);
       var output_file = `public/data/process/masks/png/${file_basename}.png`
       // call gdal
@@ -144,22 +147,25 @@ router.get("/maskconverter/png/:image_name", (req, res) => {
       gdal.on('close', function (code) {
         // console.log(`${output_file}`);
         var image = new Jimp(output_file, function (err, image) {
+          c++;
           image.flip(false, true);
           image.write(output_file)
+          if (c == files.length) {
+            return res.send("respond with a resource");
+          }
         })
       })
     })
   });
-  res.send("respond with a resource");
 });
 
 
 
 router.get("/generate_coco_format", (req, res) => {
-  
+
   var cococreator_command = `cd public/data/ && python shapes_to_coco.py`
   var cococreator = spawn(cococreator_command, [], { shell: true });
-  
+
   cococreator.on('close', function (code) {
     res.send("json coco format generated");
   });
