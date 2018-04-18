@@ -131,8 +131,11 @@ map.on('editable:shape:deleted', function (e) {
 });
 
 window.onkeydown = function (event) {
+    console.log(event.keyCode)
+    if (event.keyCode === 188 ){
+        $('#help').modal('show');
+    }
     // ESC
-    
     if (event.keyCode === 27) {
         if (map.editTools._drawingEditor) map.editTools.stopDrawing();;
         map.editTools.featuresLayer.getLayers().forEach(function (l) {
@@ -468,3 +471,4 @@ document.getElementById("generate_mask").addEventListener("click", function (e) 
     })
 })
 
+// $('#help').modal('show');
