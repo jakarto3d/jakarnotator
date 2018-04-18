@@ -131,7 +131,6 @@ map.on('editable:shape:deleted', function (e) {
 });
 
 window.onkeydown = function (event) {
-    console.log(event.keyCode)
     if (event.keyCode === 188 ){
         $('#help').modal('show');
     }
@@ -274,16 +273,17 @@ var display_polygons = function(){
                     var feature = l.feature = l.feature || {}; // Initialize feature
                     feature.type = feature.type || "Feature"; // Initialize feature.type
                     var props = feature.properties = feature.properties || {}; // Initialize feature.properties
-                    props.class_css = props.class_css = props.class_css || "color-default"
+                    props.class_css = props.class_css = props.class_css || "annotation_class_default"
 
                     var selection = document.querySelector("." + props.class_css);
                     if (selection === null) {
 
                         console.info("css class is missing : " + props.class_css)
-                        // selection = document.querySelector(".annotation_class_default");
+                        l.setStyle({ opacity: 1, fillOpacity:1, fillColor: "#000000" });
+                    } else {
+                        var style = getComputedStyle(selection);
+                        l.setStyle({ fillColor: style.color });
                     }
-                    var style = getComputedStyle(selection);
-                    l.setStyle({ fillColor: style.color });
                 }
                 );
             }
