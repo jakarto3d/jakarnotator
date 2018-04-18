@@ -371,6 +371,9 @@ document.getElementById("previous").addEventListener("click", function (e) {
     window.localStorage.setItem("index_image", index_image);
 })
 
+document.getElementById("help_btn").addEventListener("click", function (e) {
+    $('#help').modal('show');
+})
 
 var annotation_list;
 var $treeview = $('#tree')
