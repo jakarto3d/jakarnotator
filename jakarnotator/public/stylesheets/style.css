@@ -1,5 +1,7 @@
 #map { height: 800px;}
-.color-default { color:black !important; }
-.color-vegetation { color:green !important; }
-.color-signalisation { color:red !important; }
-.color-human { color:rgb(100, 64, 16) !important; }
+.annotation_class_default { color:rgb(4, 0, 255) !important;}
+.annotation_class_signalisation { color:rgb(255, 0, 0) !important;}
+.annotation_class_vegetation { color:rgb(30, 255, 0) !important;}
+.annotation_class_arbre { color:rgb(17, 131, 2) !important;}
+.annotation_class_nature { color:rgb(11, 82, 2) !important;}
+.annotation_class_people { color:rgb(56, 36, 0) !important;}

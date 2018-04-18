@@ -105,8 +105,12 @@ map.on('editable:drawing:end', function (e) {
     props.category = current_class;
     props.class_css = current_class_css;
 
-    var elem = document.querySelector("." + current_class_css);
-    var style = getComputedStyle(elem);
+    var selection = document.querySelector("." + current_class_css);
+    // if (selection === null) {
+    //     console.info("css class is missing : " + current_class_css)
+    //     selection = document.querySelector(".annotation_class_default");
+    // }
+    var style = getComputedStyle(selection);
     layer.setStyle({ fillColor: style.color });
 
     save_polygon(e)
@@ -269,8 +273,13 @@ var display_polygons = function(){
                     var props = feature.properties = feature.properties || {}; // Initialize feature.properties
                     props.class_css = props.class_css = props.class_css || "color-default"
 
-                    var elem = document.querySelector("." + props.class_css);
-                    var style = getComputedStyle(elem);
+                    var selection = document.querySelector("." + props.class_css);
+                    if (selection === null) {
+
+                        console.info("css class is missing : " + props.class_css)
+                        // selection = document.querySelector(".annotation_class_default");
+                    }
+                    var style = getComputedStyle(selection);
                     l.setStyle({ fillColor: style.color });
                 }
                 );
@@ -360,69 +369,102 @@ document.getElementById("previous").addEventListener("click", function (e) {
 })
 
 
-
+var annotation_list;
 var $treeview = $('#tree')
-$treeview
-    .jstree({
-        "core": {
-            "check_callback": true,
-            'data': [
-                { "id": "0", "parent": "#", "text": "Default label", "state": { "selected": true }, "li_attr": { "class": "color-default" } },
-                { "id": "1", "parent": "#", "text": "Signalisation", "li_attr": { "class": "color-signalisation" } },
-                { "id": "2", "parent": "#", "text": "Végétation", "li_attr": { "class": "color-vegetation" } },
-                { "id": "2.1", "parent": "2", "text": "Arbre", "li_attr": { "class": "color-vegetation" } },
-                { "id": "2.2", "parent": "2", "text": "Nature", "li_attr": { "class": "color-vegetation" } },
-                { "id": "3", "parent": "#", "text": "People", "li_attr": { "class": "color-human" } },
-            ],
-            "multiple": false,
-        },
-        "types": {
-            "default": {
-                "icon": "glyphicon glyphicon-ok"
-            }
-        },
-        "plugins": ["dnd", "contextmenu", "state", "types"]
-    })
-    .on('ready.jstree', function () {
-        current_class = $treeview.jstree("get_selected", true)[0].text
-        current_class_css = $treeview.jstree("get_selected", true)[0].li_attr.class
-        $("#selected").text(current_class)
-        $treeview.jstree('open_all');
-        $treeview.on("changed.jstree", function (e, data) {
-            current_class = $treeview.jstree("get_selected", true)[0].text
-            current_class_css = $treeview.jstree("get_selected", true)[0].li_attr.class
-            $("#selected").text(current_class)
-
-            if (editing_layer){
-                var layer = editing_layer,
-                    feature = layer.feature = layer.feature || {}; // Initialize feature
-
-                feature.type = feature.type || "Feature"; // Initialize feature.type
-                var props = feature.properties = feature.properties || {}; // Initialize feature.properties
-                props.category = current_class;
-                props.class_css = current_class_css;
-
-                var elem = document.querySelector("." + current_class_css);
-                var style = getComputedStyle(elem);
-                layer.setStyle({ fillColor: style.color });
-                save_polygon(e)
-            }
-        });
-        $.ajax({
-            url: "/images",
-            type: 'GET',
-            success: function (data) {
-                images_list = JSON.parse(data);
-                img.src = '/data/images/' + images_list[index_image];
-            }
-        })
-    })
-    .bind("loaded.jstree", function (event, data) {
-        $("#tree li a").addTouch();
-    });
+$.ajax({
+    url: "/list_annotations",
+    type: 'GET',
+    success: function (data) {
+        $treeview
+            .jstree({
+                "core": {
+                    "check_callback": true,
+                    'data': data,
+                    "multiple": false,
+                },
+                "types": {
+                    "default": {
+                        "icon": "glyphicon glyphicon-ok"
+                    }
+                },
+                "plugins": ["dnd", "state", "types"]
+            });
+        $treeview.on('ready.jstree', function () {
+                $treeview.jstree('open_all');
+                $treeview.on("changed.jstree", function (e, data) {
+                    current_class = $treeview.jstree("get_selected", true)[0].text
+                    current_class_css = $treeview.jstree("get_selected", true)[0].li_attr.class
+                    $("#selected").text(current_class)
+        
+                    if (editing_layer){
+                        var layer = editing_layer,
+                            feature = layer.feature = layer.feature || {}; // Initialize feature
+        
+                        feature.type = feature.type || "Feature"; // Initialize feature.type
+                        var props = feature.properties = feature.properties || {}; // Initialize feature.properties
+                        props.category = current_class;
+                        props.class_css = current_class_css;
+        
+                        var selection = document.querySelector("." + current_class_css);
+                        // if (selection === null) {
+                        //     console.info("css class is missing : " + current_class_css)
+                        //     selection = document.querySelector(".annotation_class_default");
+                        // }
+                        var style = getComputedStyle(selection);
+                        layer.setStyle({ fillColor: style.color });
+                        save_polygon(e)
+                    }
+                });
+                $.ajax({
+                    url: "/images",
+                    type: 'GET',
+                    success: function (data) {
+                        images_list = JSON.parse(data);
+                        img.src = '/data/images/' + images_list[index_image];
+                    }
+                })
+            })
+            .bind("loaded.jstree", function (event, data) {
+                $("#tree li a").addTouch();
+            });
+    }
+});
 
 
 document.getElementById("expand_all").addEventListener("click", function (e) {
     $treeview.jstree('open_all');
+})
+document.getElementById("generate_mask").addEventListener("click", function (e) {
+    console.log("done");
+    images_list.forEach(function(image){
+        $.ajax({
+            url: `/process/spliter/${image}`,
+            success: function(data){
+                console.log("spliter done");
+                $.ajax({
+                    url: `/process/maskconverter/tif/${image}`,
+                    success: function (data) {
+                        console.log("tif converter done for image " + image);
+                        $.ajax({
+                            url: `/process/maskconverter/png/${image}`,
+                            success: function (data) {
+                                console.log("png converter done for image " + image);
+                                $.ajax({
+                                    url: `/process/generate_coco_format`,
+                                    success: function (data) {
+                                        console.log("json coco format generated");
+                                    }
+                                })
+                            }
+                        })
+                    }
+                })
+            }
+        })
+        // console.log(image);
+        // /spliter/image
+            // / maskconverter / tif /: image_name
+            // / maskconverter / png /: image_name
+    })
 })
 

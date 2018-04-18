@@ -71,8 +71,8 @@ router.get("/spliter/:image_name", (req, res) => {
         console.log(`${filename} created`);
       });
     })
+    res.send("respond with a resource");
   });
-  res.send("respond with a resource");
 });
 
 
@@ -106,15 +106,15 @@ router.get("/maskconverter/tif/:image_name", (req, res) => {
         // gdal.stderr.on('data', (data) => {
         //   console.log(`stderr: ${data}`);
         // });
-        // gdal.on('close', function(code){
-        //   console.log(`child process exited with code ${code}`);
-        // })
+        gdal.on('close', function(code){
+          console.log(`child process exited with code ${code}`);
+        })
       })
     })
   });
-
-
   res.send("respond with a resource");
+
+
 });
 
 
@@ -126,7 +126,6 @@ router.get("/maskconverter/png/:image_name", (req, res) => {
   // get all masks geojson to transform
   glob(`public/data/process/masks/tif/${image_basename}*.tif`, function (er, files) {
     files.forEach(function (file) {
-      console.log(file);
       var file_basename = file.replace(/.*\//, "")  // Remove all the thing before the last slash (server url & api)
       .replace(/\.[^/.]+$/, "")  // Remove all the thing after the last . (extension)
       
@@ -152,6 +151,18 @@ router.get("/maskconverter/png/:image_name", (req, res) => {
     })
   });
   res.send("respond with a resource");
+});
+
+
+
+router.get("/generate_coco_format", (req, res) => {
+  
+  var cococreator_command = `cd public/data/ && python shapes_to_coco.py`
+  var cococreator = spawn(cococreator_command, [], { shell: true });
+  
+  cococreator.on('close', function (code) {
+    res.send("json coco format generated");
+  });
 });
 
 module.exports = router;

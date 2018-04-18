@@ -1,11 +1,11 @@
 var express = require("express");
 var router = express.Router();
 var bodyParser = require('body-parser');
+var fs = require("fs");
 
 router.use(bodyParser.json());  // parse application/json
 router.use(bodyParser.urlencoded({ extended: true }));  // parse application/x-www-form-urlencoded
 
-var fs = require("fs");
 
 /* GET users listing. */
 router.get("/", function(req, res, next) {
@@ -40,7 +40,8 @@ router.post("/:image_name", (req, res) => {
     if (err) throw err;
     res.json({ message: `${image_name} updated` });
   });
-
-
 });
+
+
+
 module.exports = router;
