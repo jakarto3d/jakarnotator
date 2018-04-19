@@ -1,4 +1,6 @@
 #map { height: 800px;}
+#tree { max-height: 100%; overflow-y: scroll;}
+
 .annotation_class_signalisation { color:rgb(255, 0, 255) !important;}
 .annotation_class_signalisationBlanc { color:rgb(116, 116, 116) !important;}
 .annotation_class_signalisationBleu { color:rgb(4, 0, 255) !important;}

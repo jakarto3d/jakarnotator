@@ -22,21 +22,29 @@ block head
 
 
 block content
-  h1= title
-  p Welcome to #{title}
-  #map
-  input#next(type='button', value='next image')
-  input#previous(type='button', value='previous image')
-  input#generate_mask(type='button', value='Generate mask')
-  input#help_btn(type='button', value='help')
-  #tree
-    ul
-  input#expand_all(type='button', value='Expand All')
-  div
-    p
-      | Selected label :
-      span#selected
-  script(src='/javascripts/script.js')
+  div.container-fluid
+    div.row
+      h1= title
+      p Welcome to #{title}. The dataset annotator tool designed by Loïc Messal for Jakarto.
+  div.container-fluid
+    div#main.row.equal
+      div.col-md-8
+        #map
+      div.col-md-4
+        div
+          p
+            | Selected label :
+            span#selected
+        #tree
+          ul
+    div.row
+
+      input#next(type='button', value='next image')
+      input#previous(type='button', value='previous image')
+      input#generate_mask(type='button', value='Generate mask')
+      input#help_btn(type='button', value='help')
+      input#expand_all(type='button', value='Expand All')
+      script(src='/javascripts/script.js')
 
   #help.modal.fade
     .modal-dialog

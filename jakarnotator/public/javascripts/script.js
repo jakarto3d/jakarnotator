@@ -1,5 +1,4 @@
 // window.localStorage.clear();
-// Save the polygon when editing is finish
 
 var width;
 var height;
@@ -151,8 +150,8 @@ window.onkeydown = function (event) {
             }
         })
     }
-    // ²
-    if (event.keyCode === 222) {
+    // ² ou | # ~ (clavier canadien)
+    if (event.keyCode === 222 || event.keyCode === 192) {
         map.editTools.featuresLayer.getLayers().forEach(function (l) {
             if (l instanceof L.LayerGroup) {
                 l.getLayers().forEach(function (layer) {
