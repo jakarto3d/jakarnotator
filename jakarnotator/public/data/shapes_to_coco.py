@@ -4,18 +4,19 @@ import datetime
 import json
 import os
 import re
+import sys
 import fnmatch
 from PIL import Image
+from PIL import ImageFile
 import numpy as np
 from pycococreatortools import pycococreatortools
-
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 ROOT_DIR = '.'
 IMAGE_DIR = os.path.join(ROOT_DIR, "images")
 ANNOTATION_DIR = os.path.join(ROOT_DIR, "process/masks/png")
 current_year = datetime.datetime.now().year
 OUTPUT_JSON = "instances_shape_jakartotrain{}.json".format(current_year)
 
-print(IMAGE_DIR)
 INFO = {
     "description": "Jakarto Dataset",
     "url": "https://jakarto.com",
@@ -89,6 +90,7 @@ def main():
             image = Image.open(image_filename)
             image_info = pycococreatortools.create_image_info(
                 image_id, os.path.basename(image_filename), image.size)
+            del image
             coco_output["images"].append(image_info)
 
             # filter for associated png annotations
@@ -98,17 +100,17 @@ def main():
                 # go through each associated annotation
                 for annotation_filename in annotation_files:
                     cat_name = annotation_filename.rsplit('_', 2)[-2]
-                    print(cat_name)
                     category_annotation = find_category(cat_name)
                     class_id = category_annotation["id"]
 
                     category_info = {'id': class_id, 'is_crowd': 'crowd' in image_filename}
-                    binary_mask = np.asarray(Image.open(annotation_filename)
-                        .convert('1')).astype(np.uint8)
+                    image_annotation = Image.open(annotation_filename)
+                    binary_mask = np.asarray(image_annotation.convert('1')).astype(np.uint8)
                     
                     annotation_info = pycococreatortools.create_annotation_info(
                         segmentation_id, image_id, category_info, binary_mask,
-                        image.size, tolerance=2)
+                        image_annotation.size, tolerance=2)
+                    del image_annotation
 
                     if annotation_info is not None:
                         coco_output["annotations"].append(annotation_info)

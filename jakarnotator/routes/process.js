@@ -2,6 +2,7 @@ var express = require("express");
 var router = express.Router();
 var bodyParser = require('body-parser');
 var Jimp = require("jimp");
+var sharp = require("sharp");
 var glob = require("glob");
 const { spawn } = require('child_process');
 
@@ -61,22 +62,29 @@ router.get("/spliter/:image_name", (req, res) => {
 
   reset_category_counter(image_basename);
   fs.readFile(mask, "utf8", function (err, data) {
-    if (err) throw err;
+    // if (err) throw err;
+    if (err){
+      return res.status(404).send("no data");
+    };
     var data_array = JSON.parse(data);
-    data_array.forEach(function (item) {
-      var category = item.properties.category;
-      var index = update_category_counter(image_basename, category);
-      var filename = `${image_basename}_${category}_${index}`
-      var path = `public/data/process/masks/geojson/${filename}.geojson`;
-      fs.writeFile(path, JSON.stringify(item), function (err) {
-        c++;
-        if (err) throw err;
-        console.log(`${filename} created`);
-        if (c == data_array.length) {
-          return res.send("respond with a resource");
-        }
-      });
-    })
+    if (data_array.length > 0){
+      data_array.forEach(function (item) {
+        var category = item.properties.category;
+        var index = update_category_counter(image_basename, category);
+        var filename = `${image_basename}_${category}_${index}`
+        var path = `public/data/process/masks/geojson/${filename}.geojson`;
+        fs.writeFile(path, JSON.stringify(item), function (err) {
+          c++;
+          if (err) throw err;
+          // console.log(`${filename} created`);
+          if (c == data_array.length) {
+            return res.send("respond with a resource");
+          }
+        });
+      })
+    } else {
+      return res.status(404).send("Image data not found");
+    }
   });
 });
 
@@ -86,15 +94,20 @@ router.get("/maskconverter/tif/:image_name", (req, res) => {
   var image_basename = image_name.replace(/\.[^/.]+$/, "");
   var image_path = `public/data/images/${image_name}`;
 
-  var c = 0;
-  // get size of the image
-  var image = new Jimp(image_path, function (err, image) {
-    var w = image.bitmap.width; // the width of the image
-    var h = image.bitmap.height; // the height of the image
-    // console.log(w, h);
-
-    // get all masks geojson to transform
-    glob(`public/data/process/masks/geojson/${image_basename}*.geojson`, function (er, files) {
+  glob(`public/data/process/masks/geojson/${image_basename}*.geojson`, function (er, files) {
+    // console.log(er)
+    // console.log(files)
+    if (files.length == 0){
+      return res.status(404).send("Corresponding data not found");
+    }
+    var c = 0;
+    // get size of the image
+    var image = new Jimp(image_path, function (err, image) {
+      var w = image.bitmap.width; // the width of the image
+      var h = image.bitmap.height; // the height of the image
+      // console.log(w, h);
+  
+      // get all masks geojson to transform
       files.forEach(function (file) {
         // console.log(file);
         var file_basename = file.replace(/.*\//, "")  // Remove all the thing before the last slash (server url & api)
@@ -109,14 +122,16 @@ router.get("/maskconverter/tif/:image_name", (req, res) => {
 
         gdal.on('close', function (code) {
           c++;
-          console.log(`child process exited with code ${code}`);
+          // console.log(`child process exited with code ${code}`);
           if (c == files.length) {
             return res.send("respond with a resource");
           }
         })
       })
-    })
-  });
+    });
+  })
+
+
 });
 
 
@@ -126,8 +141,12 @@ router.get("/maskconverter/png/:image_name", (req, res) => {
   var image_path = `public/data/images/${image_name}`;
   var c = 0;
 
+
   // get all masks geojson to transform
   glob(`public/data/process/masks/tif/${image_basename}*.tif`, function (er, files) {
+    if (files.length == 0) {
+      return res.status(404).send("Corresponding data not found");
+    }
     files.forEach(function (file) {
       var file_basename = file.replace(/.*\//, "")  // Remove all the thing before the last slash (server url & api)
         .replace(/\.[^/.]+$/, "")  // Remove all the thing after the last . (extension)
@@ -145,15 +164,19 @@ router.get("/maskconverter/png/:image_name", (req, res) => {
       //   console.log(`stderr: ${data}`);
       // });
       gdal.on('close', function (code) {
-        // console.log(`${output_file}`);
-        var image = new Jimp(output_file, function (err, image) {
+        sharp(output_file).flip().toFile(output_file, function (err) {
           c++;
-          image.flip(false, true);
-          image.write(output_file)
           if (c == files.length) {
             return res.send("respond with a resource");
           }
-        })
+
+        });
+        // var image = new Jimp(output_file, function (err, image) {
+        //   console.log(err);
+        //   console.log(image);
+        //   image.flip(false, true).write(output_file, function(){
+        //   });
+        // })
       })
     })
   });
@@ -165,7 +188,12 @@ router.get("/generate_coco_format", (req, res) => {
 
   var cococreator_command = `cd public/data/ && python shapes_to_coco.py`
   var cococreator = spawn(cococreator_command, [], { shell: true });
-
+  cococreator.stdout.on('data', (data) => {
+    console.log(`cococreator stdout: ${data}`);
+  });
+  cococreator.stderr.on('data', (data) => {
+    console.log(`cococreator stderr: ${data}`);
+  });
   cococreator.on('close', function (code) {
     res.send("json coco format generated");
   });

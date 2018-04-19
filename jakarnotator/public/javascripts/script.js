@@ -442,29 +442,74 @@ document.getElementById("expand_all").addEventListener("click", function (e) {
 })
 document.getElementById("generate_mask").addEventListener("click", function (e) {
     console.log("done");
+    var c0 = 0;
+    var c1 = 0;
+    var c2 = 0;
     images_list.forEach(function(image){
         $.ajax({
             url: `/process/spliter/${image}`,
-            success: function(data){
-                console.log("spliter done");
-                $.ajax({
-                    url: `/process/maskconverter/tif/${image}`,
-                    success: function (data) {
-                        console.log("tif converter done for image " + image);
+            complete: function(){
+                c0++;
+                // console.log(`c0 : ${c0}`);
+                if (c0 == images_list.length){
+                    console.log("spliter done");
+                    images_list.forEach(function (image) {
                         $.ajax({
-                            url: `/process/maskconverter/png/${image}`,
-                            success: function (data) {
-                                console.log("png converter done for image " + image);
-                                $.ajax({
-                                    url: `/process/generate_coco_format`,
-                                    success: function (data) {
-                                        console.log("json coco format generated");
-                                    }
-                                })
-                            }
-                        })
-                    }
-                })
+                            url: `/process/maskconverter/tif/${image}`,
+                            complete: function(){
+                                c1++;
+                                // console.log(`c1 : ${c1}`);
+                                if (c1 == images_list.length){
+                                    console.log("maskconverter tif done");
+                                    images_list.forEach(function (image) {
+                                        $.ajax({
+                                            url: `/process/maskconverter/png/${image}`,
+                                            complete: function () {
+                                                c2++;
+                                                // console.log(`c2 : ${c2}`);
+                                                if (c2 == images_list.length) {
+                                                    console.log("maskconverter png done");
+                                                    $.ajax({
+                                                        url: `/process/generate_coco_format`,
+                                                        success: function (data) {
+                                                            console.log(data);
+                                                            console.log("json coco format generated");
+                                                        }
+                                                    })
+                                                }
+                                            }
+                                        })
+                                    })
+                                }
+                        }})})
+                    //         error: function(){
+                    //             c1++;
+                    //             console.log(`c1 : ${c1}`);
+                    //         },
+                    //         success: function (data) {
+                    //             c1++;
+                    //             console.log(`c1 : ${c1}`);
+                    //             // console.log("tif converter done for image " + image);
+                    //             // console.log(data);
+                    //             if (c0 == images_list.length)
+                    //             $.ajax({
+                    //                 url: `/process/maskconverter/png/${image}`,
+                    //                 success: function (data) {
+                    //                     console.log(data);
+                    //                     console.log("png converter done for image " + image);
+                    //                     $.ajax({
+                    //                         url: `/process/generate_coco_format`,
+                    //                         success: function (data) {
+                    //                             console.log(data);
+                    //                             console.log("json coco format generated");
+                    //                         }
+                    //                     })
+                    //                 }
+                    //             })
+                    //         }
+                    //     })
+                    // });
+                }
             }
         })
         // console.log(image);
