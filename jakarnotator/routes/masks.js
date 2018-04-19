@@ -43,5 +43,18 @@ router.post("/:image_name", (req, res) => {
 });
 
 
+router.get("/stats/:image_name", (req, res) => {
+  var image_name = req.params.image_name;
+  var mask = `public/data/masks/${image_name}.json`;
+
+  fs.readFile(mask, "utf8", function (err, data) {
+    if (err) {
+      res.send("0");
+    } else {
+      res.send(`${JSON.parse(data).length}`);
+    }
+  });
+});
+
 
 module.exports = router;
