@@ -51,7 +51,12 @@ router.get("/stats/:image_name", (req, res) => {
     if (err) {
       res.send("0");
     } else {
-      res.send(`${JSON.parse(data).length}`);
+      var output_data = JSON.parse(data)
+      if (output_data.length === undefined){
+        res.send("0");
+      } else {
+        res.send(`${JSON.parse(data).length}`);
+      }
     }
   });
 });

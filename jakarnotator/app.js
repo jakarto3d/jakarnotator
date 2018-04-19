@@ -39,6 +39,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/scripts", express.static(path.join(__dirname, "node_modules/vue2-bootstrap-table2/dist")));
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);

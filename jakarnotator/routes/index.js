@@ -8,16 +8,17 @@ router.get('/', function (req, res, next) {
   res.render('index', { title: 'Jakarnotator' });
 });
 
+router.get('/stats/', function (req, res, next) {
+  res.render('stats', { title: 'the stat view' });
+});
+
 
 router.get("/list_annotations", (req, res) => {
-  console.log("file");
   var annotation_file = `public/data/annotation_list.json`;
 
-  console.log(annotation_file);
   fs.readFile(annotation_file, "utf8", function (err, data) {
     if (err) throw err;
     var data = JSON.parse(data);
-    // console.log(data);
 
     var annotation_list_for_jstree_format = []
 
