@@ -39,22 +39,10 @@ router.get("/list_annotations", (req, res) => {
       new_formated_category.li_attr = { "class": `annotation_class_${category.name}` }
 
       annotation_list_for_jstree_format.push(new_formated_category)
-      // console.log(category.name);
     })
 
-    // annotation_list_for_jstree_format.push(data[0])
-    // console.log(annotation_list_for_jstree_format)
-
     res.send(annotation_list_for_jstree_format);
-    // res.send(JSON.stringify(annotation_list_for_jstree_format));
   });
 });
-
-// { "id": "0", "parent": "#", "text": "Default label", "state": { "selected": true }, "li_attr": { "class": "color-default" } },
-// { "id": "1", "parent": "#", "text": "Signalisation", "li_attr": { "class": "color-signalisation" } },
-// { "id": "2", "parent": "#", "text": "Végétation", "li_attr": { "class": "color-vegetation" } },
-// { "id": "2.1", "parent": "2", "text": "Arbre", "li_attr": { "class": "color-vegetation" } },
-// { "id": "2.2", "parent": "2", "text": "Nature", "li_attr": { "class": "color-vegetation" } },
-// { "id": "3", "parent": "#", "text": "People", "li_attr": { "class": "color-human" } },
 
 module.exports = router;
