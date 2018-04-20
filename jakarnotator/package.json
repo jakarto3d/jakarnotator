@@ -7,20 +7,16 @@
     "dev": "gulp"
   },
   "dependencies": {
-    "browser-sync": "^2.23.6",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
     "express-easy-zip": "^1.1.4",
     "express-prom-bundle": "^3.3.0",
     "glob": "^7.1.2",
-    "gulp": "^3.9.1",
-    "gulp-nodemon": "^2.2.1",
     "http-errors": "~1.6.2",
     "jimp": "^0.2.28",
     "morgan": "~1.9.0",
     "npm": "^5.8.0",
-    "prom-client": "^11.0.0",
     "pug": "2.0.0-beta11",
     "sharp": "^0.20.1",
     "socket.io": "^2.1.0",
@@ -28,12 +24,15 @@
     "vue2-bootstrap-table2": "^1.1.8"
   },
   "devDependencies": {
+    "browser-sync": "^2.23.6",
     "eslint-config-google": "^0.9.1",
     "eslint-config-standard": "^11.0.0",
     "eslint-plugin-import": "^2.11.0",
     "eslint-plugin-node": "^6.0.1",
     "eslint-plugin-promise": "^3.7.0",
     "eslint-plugin-standard": "^3.0.1",
+    "gulp": "^3.9.1",
+    "gulp-nodemon": "^2.2.1",
     "nodemon": "^1.17.3"
   }
 }
