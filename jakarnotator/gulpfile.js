@@ -11,7 +11,7 @@ gulp.task('default', ['browser-sync'], function () {
 gulp.task('browser-sync', ['nodemon'], function () {
     browserSync.init(null, {
         proxy: "http://localhost:8080",  // TODO(tofull) find a way to use port as variable
-        files: ["public/**/*.*", "views/**/*.*", "routes/**/*.*"],
+        files: ["public/(?!data)**/*.*", "views/**/*.*", "routes/**/*.*"],
         ignore: ["public/data/**.*"],
         port: 8081,  // TODO(tofull) find a way to use port as variable
     });
