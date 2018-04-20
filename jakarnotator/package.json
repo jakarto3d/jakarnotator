@@ -11,6 +11,7 @@
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
+    "express-easy-zip": "^1.1.4",
     "express-prom-bundle": "^3.3.0",
     "glob": "^7.1.2",
     "gulp": "^3.9.1",

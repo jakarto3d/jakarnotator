@@ -2,12 +2,15 @@ var express = require("express");
 var router = express.Router();
 var bodyParser = require('body-parser');
 var Jimp = require("jimp");
+var path = require("path");
 var sharp = require("sharp");
 var glob = require("glob");
+var zip = require('express-easy-zip');
 const { spawn } = require('child_process');
 
 router.use(bodyParser.json());  // parse application/json
 router.use(bodyParser.urlencoded({ extended: true }));  // parse application/x-www-form-urlencoded
+router.use(zip());
 
 var fs = require("fs");
 var category_counter = {};
@@ -151,18 +154,10 @@ router.get("/maskconverter/png/:image_name", (req, res) => {
       var file_basename = file.replace(/.*\//, "")  // Remove all the thing before the last slash (server url & api)
         .replace(/\.[^/.]+$/, "")  // Remove all the thing after the last . (extension)
 
-      // console.log(file_basename);
       var output_file = `public/data/process/masks/png/${file_basename}.png`
       // call gdal
       var gdal_command = `gdal_translate.exe -of PNG  "${file}" "${output_file}"`
-      // console.log(gdal_command)
       var gdal = spawn(gdal_command, [], { shell: true });
-      // gdal.stdout.on('data', (data) => {
-      //   console.log(`stdout: ${data}`);
-      // });
-      // gdal.stderr.on('data', (data) => {
-      //   console.log(`stderr: ${data}`);
-      // });
       gdal.on('close', function (code) {
         sharp(output_file).flip().toFile(output_file, function (err) {
           c++;
@@ -171,12 +166,6 @@ router.get("/maskconverter/png/:image_name", (req, res) => {
           }
 
         });
-        // var image = new Jimp(output_file, function (err, image) {
-        //   console.log(err);
-        //   console.log(image);
-        //   image.flip(false, true).write(output_file, function(){
-        //   });
-        // })
       })
     })
   });
@@ -197,6 +186,28 @@ router.get("/generate_coco_format", (req, res) => {
   cococreator.on('close', function (code) {
     res.send("json coco format generated");
   });
+});
+
+
+
+router.get('/download', function (req, res, next) {
+  // Create a download route for downloading images and coco formated data in a zip file
+  // http://programmerblog.net/zip-or-unzip-files-using-nodejs-tutorial/
+
+  var export_files = []
+  var imageFolder = 'public/data/images'
+  fs.readdir(imageFolder, (err, files) => {
+    files.forEach(function (file) {
+      export_files.push({path: path.join(__dirname, `../public/data/images/${file}`), name: `images/${file}` })
+    })
+    export_files.push({ path: path.join(__dirname, '../public/data/instances_shape_jakartotrain2018.json'), name: 'instances_shape_jakartotrain2018.json' })
+
+    res.zip({
+      files: export_files,
+      filename: 'jakartoDataset_train2018.zip'
+    });
+  })
+
 });
 
 module.exports = router;

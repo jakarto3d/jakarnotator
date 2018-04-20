@@ -410,11 +410,8 @@ $.ajax({
                         props.category = current_class;
                         props.class_css = current_class_css;
         
+                        // TODO(tofull) analyse why I used this queryselector...
                         var selection = document.querySelector("." + current_class_css);
-                        // if (selection === null) {
-                        //     console.info("css class is missing : " + current_class_css)
-                        //     selection = document.querySelector(".annotation_class_default");
-                        // }
                         var style = getComputedStyle(selection);
                         layer.setStyle({ fillColor: style.color });
                         save_polygon(e)
@@ -449,7 +446,6 @@ document.getElementById("generate_mask").addEventListener("click", function (e) 
             url: `/process/spliter/${image}`,
             complete: function(){
                 c0++;
-                // console.log(`c0 : ${c0}`);
                 if (c0 == images_list.length){
                     console.log("spliter done");
                     images_list.forEach(function (image) {
@@ -457,7 +453,6 @@ document.getElementById("generate_mask").addEventListener("click", function (e) 
                             url: `/process/maskconverter/tif/${image}`,
                             complete: function(){
                                 c1++;
-                                // console.log(`c1 : ${c1}`);
                                 if (c1 == images_list.length){
                                     console.log("maskconverter tif done");
                                     images_list.forEach(function (image) {
@@ -465,7 +460,6 @@ document.getElementById("generate_mask").addEventListener("click", function (e) 
                                             url: `/process/maskconverter/png/${image}`,
                                             complete: function () {
                                                 c2++;
-                                                // console.log(`c2 : ${c2}`);
                                                 if (c2 == images_list.length) {
                                                     console.log("maskconverter png done");
                                                     $.ajax({
@@ -481,41 +475,24 @@ document.getElementById("generate_mask").addEventListener("click", function (e) 
                                     })
                                 }
                         }})})
-                    //         error: function(){
-                    //             c1++;
-                    //             console.log(`c1 : ${c1}`);
-                    //         },
-                    //         success: function (data) {
-                    //             c1++;
-                    //             console.log(`c1 : ${c1}`);
-                    //             // console.log("tif converter done for image " + image);
-                    //             // console.log(data);
-                    //             if (c0 == images_list.length)
-                    //             $.ajax({
-                    //                 url: `/process/maskconverter/png/${image}`,
-                    //                 success: function (data) {
-                    //                     console.log(data);
-                    //                     console.log("png converter done for image " + image);
-                    //                     $.ajax({
-                    //                         url: `/process/generate_coco_format`,
-                    //                         success: function (data) {
-                    //                             console.log(data);
-                    //                             console.log("json coco format generated");
-                    //                         }
-                    //                     })
-                    //                 }
-                    //             })
-                    //         }
-                    //     })
-                    // });
                 }
             }
         })
-        // console.log(image);
-        // /spliter/image
-            // / maskconverter / tif /: image_name
-            // / maskconverter / png /: image_name
     })
 })
 
-// $('#help').modal('show');
+
+$("#search").change(function(e){
+    map.dragging.disable();
+    map.off('drag');
+    socket.emit('room-leave', images_list[index_image]);
+
+    var index_image_temp = images_list.indexOf($("#search").val());
+    if (index_image_temp !== -1){
+        console.log(index_image);
+        index_image = index_image_temp
+        map.removeLayer(image);
+        img.src = '/data/images/' + images_list[index_image];
+        window.localStorage.setItem("index_image", index_image);
+    }
+})
