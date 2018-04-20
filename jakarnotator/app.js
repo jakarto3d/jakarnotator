@@ -9,26 +9,11 @@ var usersRouter = require("./routes/users");
 var masksRouter = require("./routes/masks");
 var imagesRouter = require("./routes/images");
 var processRouter = require("./routes/process");
-
+const promBundle = require("express-prom-bundle");
 var app = express();
+const metricsMiddleware = promBundle({ includeMethod: true });
 
-const Prometheus = require('prom-client')
-const metricsInterval = Prometheus.collectDefaultMetrics()
-const checkoutsTotal = new Prometheus.Counter({
-  name: 'checkouts_total',
-  help: 'Total number of checkouts',
-  labelNames: ['payment_method']
-})
-const httpRequestDurationMicroseconds = new Prometheus.Histogram({
-  name: 'http_request_duration_ms',
-  help: 'Duration of HTTP requests in ms',
-  labelNames: ['method', 'route', 'code'],
-  buckets: [0.10, 5, 15, 50, 100, 200, 300, 400, 500]  // buckets for response time from 0.1ms to 500ms
-})
-app.get('/metrics', (req, res) => {
-  res.set('Content-Type', Prometheus.register.contentType)
-  res.end(Prometheus.register.metrics())
-})
+app.use(metricsMiddleware);
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
