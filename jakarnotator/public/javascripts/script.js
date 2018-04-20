@@ -436,6 +436,8 @@ $.ajax({
 document.getElementById("expand_all").addEventListener("click", function (e) {
     $treeview.jstree('open_all');
 })
+
+
 document.getElementById("generate_mask").addEventListener("click", function (e) {
     console.log("done");
     var c0 = 0;

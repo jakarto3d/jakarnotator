@@ -48,16 +48,14 @@ router.get("/stats/:image_name", (req, res) => {
   var mask = `public/data/masks/${image_name}.json`;
 
   fs.readFile(mask, "utf8", function (err, data) {
-    if (err) {
-      res.send("0");
-    } else {
+    var return_value = 0
+    if (!err) {
       var output_data = JSON.parse(data)
-      if (output_data.length === undefined){
-        res.send("0");
-      } else {
-        res.send(`${JSON.parse(data).length}`);
+      if (output_data.length !== undefined){
+        return_value = JSON.parse(data).length
       }
     }
+    res.send(JSON.stringify({ number_masks: return_value}));
   });
 });
 
