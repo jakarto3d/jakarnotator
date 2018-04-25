@@ -44,7 +44,9 @@ block content
       input#generate_mask(type='button', value='Generate mask')
       input#help_btn(type='button', value='help')
       input#expand_all(type='button', value='Expand All')
-      input#search(type='text')
+      input#search(type='text', placeholder="Search an image by name")
+      a(href="/stats")
+        | Stat page
       script(src='/javascripts/script.js')
 
   #help.modal.fade

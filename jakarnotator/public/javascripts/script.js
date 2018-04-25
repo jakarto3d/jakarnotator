@@ -1,5 +1,5 @@
 // window.localStorage.clear();
-
+// TODO(tofull) Fix when socket receive new data : dont erase current editing, or save it...
 var width;
 var height;
 var scaling;
@@ -335,6 +335,11 @@ socket.on('connect', function () {
     }
     
     socket.on('should_refresh_json', function (data) {
+
+        // TODO(tofull) If current polygon is editing
+        // Save current polygon in window.localStorage
+        // display polygons
+        // in display_polygons, load the saved polygon and give it edition mode 
         display_polygons();
     })
 });
@@ -443,6 +448,8 @@ document.getElementById("generate_mask").addEventListener("click", function (e) 
     var c0 = 0;
     var c1 = 0;
     var c2 = 0;
+    // TODO(tofull) Use fetch instead of $.ajax
+    // TODO(tofull) This processing should be on server-side... and doesn't need routes
     images_list.forEach(function(image){
         $.ajax({
             url: `/process/spliter/${image}`,

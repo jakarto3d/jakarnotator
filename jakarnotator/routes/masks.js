@@ -7,10 +7,10 @@ router.use(bodyParser.json());  // parse application/json
 router.use(bodyParser.urlencoded({ extended: true }));  // parse application/x-www-form-urlencoded
 
 
-/* GET users listing. */
 router.get("/", function(req, res, next) {
   res.send("respond with a resource");
 });
+
 
 router.get("/:image_name", (req, res) => {
   var image_name = req.params.image_name;
@@ -29,6 +29,7 @@ router.get("/:image_name", (req, res) => {
     }
   });
 });
+
 
 router.post("/:image_name", (req, res) => {
   var image_name = req.params.image_name;

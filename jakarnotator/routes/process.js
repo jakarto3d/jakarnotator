@@ -210,4 +210,40 @@ router.get('/download', function (req, res, next) {
 
 });
 
+
+router.get("/test", function(req, res, next){
+  var output = {}
+  var all_files_processed = 0
+  glob(`public/data/masks/*.json`, function (er, files) {
+    files.forEach(function (file) {
+      fs.readFile(file, "utf8", function (err, data) {
+        var data_array = JSON.parse(data);
+        var all_feature_processed = 0
+        if (data_array.length > 0){
+          data_array.forEach(function (item) {
+            var category = item.properties.category;
+            if (output[category] === undefined) {
+              output[category] = 0;
+            } else {
+              output[category]++;
+            }
+            all_feature_processed++;
+            if (all_feature_processed == data_array.length){
+              all_files_processed++;
+            }
+            if (all_files_processed == files.length){
+              res.send(JSON.stringify(output));
+            }
+          })
+        } else {
+            all_files_processed++;
+          if (all_files_processed == files.length){
+            res.send(JSON.stringify(output));
+          }
+        }
+      })
+    })
+  })
+})
+
 module.exports = router;

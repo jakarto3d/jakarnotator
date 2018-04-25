@@ -32,6 +32,17 @@ block content
         br
         br
         vue-bootstrap-table(:columns='columns', :values='values', :show-filter='showFilter', :show-column-picker='showPicker', :paginated='paginated', :multi-column-sortable='multiColumnSortable')
-      
-  // TODO(tofull) Add stats to know number of masks per category
+
+  .container-fluid
+    h1 Nombre de masques par catégorie
+    #app_mask
+      .row
+        .col-sm-12
+          button.btn.btn-default(@click='toggleFilter') Toggle Filter
+          button.btn.btn-default(@click='togglePicker') Toggle Column Picker
+          button.btn.btn-default(@click='togglePagination') Toggle Pagination
+        br
+        br
+        vue-bootstrap-table(:columns='columns', :values='values', :show-filter='showFilter', :show-column-picker='showPicker', :paginated='paginated', :multi-column-sortable='multiColumnSortable')
+
   script(src='/javascripts/get_stats.js')
