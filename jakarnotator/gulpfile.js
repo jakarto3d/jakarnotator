@@ -4,16 +4,19 @@ var gulp = require('gulp');
 var browserSync = require('browser-sync');
 var nodemon = require('gulp-nodemon');
 
+var EXPOSED_PORT = process.env.PORT || 8080
+var SYNC_PORT = process.env.SYNCPORT || 8081
+console.log(EXPOSED_PORT)
 gulp.task('default', ['browser-sync'], function () {
 
 });
 
 gulp.task('browser-sync', ['nodemon'], function () {
     browserSync.init(null, {
-        proxy: "http://localhost:8080",  // TODO(tofull) find a way to use port as variable
+        proxy: `http://localhost:${EXPOSED_PORT}`,
         files: ["public/(?!data)**/*.*", "views/**/*.*", "routes/**/*.*"],
         ignore: ["public/data/**.*"],
-        port: 8081,  // TODO(tofull) find a way to use port as variable
+        port: SYNC_PORT,
     });
 });
 gulp.task('nodemon', function (cb) {
@@ -21,7 +24,7 @@ gulp.task('nodemon', function (cb) {
     return nodemon({
         script: './bin/www',
         env: {
-            PORT: 8080  // TODO(tofull) find a way to use port as variable
+            PORT: EXPOSED_PORT
         },
     }).on('start', function () {
         // to avoid nodemon being started multiple times
