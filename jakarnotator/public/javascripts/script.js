@@ -1,4 +1,6 @@
-// window.localStorage.clear();
+window.localStorage.clear();
+window.sessionStorage.clear();
+window.sessionStorage.removeItem("editing_polygon");
 // TODO(tofull) Fix when socket receive new data : dont erase current editing, or save it...
 var width;
 var height;
@@ -10,7 +12,7 @@ var dataset;
 var current_class;
 var current_class_css;
 var editing_layer;
-
+var DONTSAVE = false
 var images_list;
 var img = new Image();
 
@@ -54,42 +56,45 @@ var Z = 90, latlng, redoBuffer = [],
 L.DomEvent.addListener(document, 'keydown', onKeyDown, map);
 
 function save_polygon(e) {
-    dataset[img.src] = []
-    map.editTools.featuresLayer.eachLayer(function (layer) {
-        data = layer.toGeoJSON();
-        if (data.type === "FeatureCollection") {
-            // I dont know why, but Leaflet.Editable considers a polygon as a FeatureCollection of polygon the second time I draw a polygon. So extract the first (and unique) feature instead !
-            data = data.features[0]
-        }
-
-        // Check if first coordinate is different from undefined. I dont know why, but Leaflet.Editable deleteShapeAt function doesn't delete enterely the polygon...
-        if (data.geometry.coordinates[0][0] !== undefined){  
-            if (data.geometry.coordinates[0] !== undefined){
-                for (index_point in data.geometry.coordinates[0]) {
-                    var [x, y] = data.geometry.coordinates[0][index_point];
-                    var x_in_image = Math.round(x / scaling)
-                    var y_in_image = Math.round(y / scaling)
-                    data.geometry.coordinates[0][index_point] = Array(x_in_image, height - y_in_image)
-                }
-                dataset[img.src].push(data);
+    if (!DONTSAVE){
+        dataset[img.src] = []
+        map.editTools.featuresLayer.eachLayer(function (layer) {
+            data = layer.toGeoJSON();
+            if (data.type === "FeatureCollection") {
+                // I dont know why, but Leaflet.Editable considers a polygon as a FeatureCollection of polygon the second time I draw a polygon. So extract the first (and unique) feature instead !
+                data = data.features[0]
             }
-        }
-
-    });
-
-    window.localStorage.setItem("dataset", JSON.stringify(dataset));
-
-    var url_mask = `/masks/${images_list[index_image]}`
-    $.ajax({
-        url: url_mask,
-        type: 'POST',
-        data: JSON.stringify(dataset[img.src]),
-        contentType: 'application/json',
-    }).done(function () {
-        socket.emit('send_a_new_json', images_list[index_image]);
-    }).fail(function (msg) {
-        console.log('Problème de synchronisation...');
-    });
+    
+            // Check if first coordinate is different from undefined. I dont know why, but Leaflet.Editable deleteShapeAt function doesn't delete enterely the polygon...
+            if (data.geometry.coordinates[0][0] !== undefined){  
+                if (data.geometry.coordinates[0] !== undefined){
+                    for (index_point in data.geometry.coordinates[0]) {
+                        var [x, y] = data.geometry.coordinates[0][index_point];
+                        var x_in_image = Math.round(x / scaling)
+                        var y_in_image = Math.round(y / scaling)
+                        data.geometry.coordinates[0][index_point] = Array(x_in_image, height - y_in_image)
+                    }
+                    dataset[img.src].push(data);
+                }
+            }
+    
+        });
+    
+        window.sessionStorage.setItem("dataset", JSON.stringify(dataset));
+    
+        var url_mask = `/masks/${images_list[index_image]}`
+        $.ajax({
+            url: url_mask,
+            type: 'POST',
+            data: JSON.stringify(dataset[img.src]),
+            contentType: 'application/json',
+        }).done(function () {
+            window.sessionStorage.removeItem("editing_polygon");
+            socket.emit('send_a_new_json', images_list[index_image]);
+        }).fail(function (msg) {
+            console.log('Problème de synchronisation...');
+        });
+    }
 
 }
 
@@ -204,19 +209,25 @@ map.on('layeradd', function (e) {
             if (l instanceof L.LayerGroup) {
                 l.getLayers().forEach(function (layer) {
                     if (layer.editEnabled() && layer !== e.layer) {
+                        DONTSAVE = true
                         layer.toggleEdit();
+                        DONTSAVE = false
                     }
                 })
             } else {
                 if (l.editEnabled() && l !== e.layer) {
+                    DONTSAVE = true
                     l.toggleEdit();
+                    DONTSAVE = false
                 }
             }
         })
         editing_layer = undefined
-
+        
         // Activate our featureLayer
+        DONTSAVE = true
         e.layer.toggleEdit();
+        DONTSAVE = false
 
         if (e.layer.editEnabled()) {
             var category = e.layer.feature.properties.category;
@@ -243,12 +254,14 @@ var display_polygons = function(){
         url: url_mask,
         type: 'GET',
         success: function (data) {
+            DONTSAVE = true
             map.editTools.featuresLayer.clearLayers();
             map.editTools.editLayer.clearLayers();
-            if (window.localStorage["dataset"] === undefined) {
+            DONTSAVE = false
+            if (window.sessionStorage["dataset"] === undefined) {
                 dataset = {};
             } else {
-                dataset = JSON.parse(window.localStorage["dataset"]);
+                dataset = JSON.parse(window.sessionStorage["dataset"]);
             }
 
             if (dataset[img.src] === undefined) {
@@ -266,9 +279,10 @@ var display_polygons = function(){
                 }
 
                 L.geoJSON(geojsonFeature).addTo(map.editTools.featuresLayer).getLayers().forEach(function (l) {
+                    DONTSAVE = true
                     l.enableEdit();
                     l.toggleEdit();
-
+                    DONTSAVE = false
                     var feature = l.feature = l.feature || {}; // Initialize feature
                     feature.type = feature.type || "Feature"; // Initialize feature.type
                     var props = feature.properties = feature.properties || {}; // Initialize feature.properties
@@ -278,13 +292,40 @@ var display_polygons = function(){
                     if (selection === null) {
 
                         console.info("css class is missing : " + props.class_css)
-                        l.setStyle({ opacity: 1, fillOpacity:1, fillColor: "#000000" });
+                        l.setStyle({ opacity: 1, fillOpacity: 1, fillColor: "#000000" });
                     } else {
                         var style = getComputedStyle(selection);
                         l.setStyle({ fillColor: style.color });
                     }
-                }
-                );
+                });
+
+            }
+            if (window.sessionStorage.getItem("editing_polygon")){
+                var geojsonFeature = JSON.parse(window.sessionStorage.getItem("editing_polygon"))
+                console.log("reloading current editing polygon")
+                console.log(geojsonFeature)
+                console.log(`DONTSAVE : ${DONTSAVE}`)
+                L.geoJSON(geojsonFeature).addTo(map.editTools.featuresLayer).getLayers().forEach(function (l) {
+                    DONTSAVE=true
+                    l.enableEdit();
+                    DONTSAVE=false
+                    // l.toggleEdit();
+    
+                    var feature = l.feature = l.feature || {}; // Initialize feature
+                    feature.type = feature.type || "Feature"; // Initialize feature.type
+                    var props = feature.properties = feature.properties || {}; // Initialize feature.properties
+                    props.class_css = props.class_css = props.class_css || "annotation_class_default"
+    
+                    var selection = document.querySelector("." + props.class_css);
+                    if (selection === null) {
+    
+                        console.info("css class is missing : " + props.class_css)
+                        l.setStyle({ opacity: 1, fillOpacity: 1, fillColor: "#000000" });
+                    } else {
+                        var style = getComputedStyle(selection);
+                        l.setStyle({ fillColor: style.color });
+                    }
+                });
             }
 
             console.log("found : " + dataset[img.src].length + ' existing polygon for this image')
@@ -335,16 +376,22 @@ socket.on('connect', function () {
     }
     
     socket.on('should_refresh_json', function (data) {
-
-        // TODO(tofull) If current polygon is editing
-        // Save current polygon in window.localStorage
-        // display polygons
-        // in display_polygons, load the saved polygon and give it edition mode 
+        map.editTools.featuresLayer.getLayers().forEach(function (l) {
+            if (l.editEnabled()) {
+                // If current polygon is editing
+                // Save current polygon in window.sessionStorage
+                // display polygons
+                // in display_polygons, load the saved polygon and give it edition mode 
+                if (l.toGeoJSON().geometry.coordinates[0].length > 3){
+                    window.sessionStorage.setItem("editing_polygon", JSON.stringify(l.toGeoJSON()))
+                }
+            }
+        })
         display_polygons();
     })
 });
 var index_image;
-index_image = parseInt(window.localStorage["index_image"]) || 0;
+index_image = parseInt(window.sessionStorage["index_image"]) || 0;
 
 
 document.getElementById("next").addEventListener("click", function (e) {
@@ -358,7 +405,7 @@ document.getElementById("next").addEventListener("click", function (e) {
     }
     map.removeLayer(image);
     img.src = '/data/images/' + images_list[index_image];
-    window.localStorage.setItem("index_image", index_image);
+    window.sessionStorage.setItem("index_image", index_image);
 })
 
 document.getElementById("previous").addEventListener("click", function (e) {
@@ -372,7 +419,7 @@ document.getElementById("previous").addEventListener("click", function (e) {
     }
     map.removeLayer(image);
     img.src = '/data/images/' + images_list[index_image];
-    window.localStorage.setItem("index_image", index_image);
+    window.sessionStorage.setItem("index_image", index_image);
 })
 
 document.getElementById("help_btn").addEventListener("click", function (e) {
@@ -401,6 +448,9 @@ $.ajax({
             });
         $treeview.on('ready.jstree', function () {
                 $treeview.jstree('open_all');
+                current_class = $treeview.jstree("get_selected", true)[0].text
+                current_class_css = $treeview.jstree("get_selected", true)[0].li_attr.class
+                $("#selected").text(current_class)
                 $treeview.on("changed.jstree", function (e, data) {
                     current_class = $treeview.jstree("get_selected", true)[0].text
                     current_class_css = $treeview.jstree("get_selected", true)[0].li_attr.class
@@ -502,6 +552,6 @@ $("#search").change(function(e){
         index_image = index_image_temp
         map.removeLayer(image);
         img.src = '/data/images/' + images_list[index_image];
-        window.localStorage.setItem("index_image", index_image);
+        window.sessionStorage.setItem("index_image", index_image);
     }
 })

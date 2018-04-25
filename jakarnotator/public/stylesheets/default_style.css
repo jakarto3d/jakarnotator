@@ -8,8 +8,8 @@ a {
 }
 
 .row.equal {
-  display: flex;
   display: -webkit-flex;
+  display: flex;
   flex-wrap: wrap;
 }
 
