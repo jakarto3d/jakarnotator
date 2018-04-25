@@ -1,0 +1,7 @@
+jakarnotator/node_modules
+jakarnotator/npm-debug.log
+jakarnotator/public/data/images/**/*
+jakarnotator/public/data/masks/**/*
+jakarnotator/public/data/process/**/*
+jakarnotator/public/data/annotation_list.json
+jakarnotator/public/data/instances_shape_jakartotrain2018.json
