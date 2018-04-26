@@ -16,7 +16,7 @@ var DONTSAVE = false
 var images_list;
 var img = new Image();
 
-var map = L.map('map', { editable: true }).setView([0.0, 0.0], 11);
+var map = L.map('map', { editable: true, attributionControl: false}).setView([0.0, 0.0], 11);
 
 
 L.NewPolygonControl = L.Control.extend({
