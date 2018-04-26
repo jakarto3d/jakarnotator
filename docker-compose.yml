@@ -1,0 +1,18 @@
+version: '3'
+services:
+  web:
+    build: .
+    ports:
+     - "8080:8080"
+    volumes:
+      - ./jakarnotator/public/data:/app/public/data
+    depends_on:
+      - redis
+    links:
+      - redis
+    environment:
+      - HOST_REDIS=redis
+  redis:
+    image: "redis"
+    ports:
+      - "6379"

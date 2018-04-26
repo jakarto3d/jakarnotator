@@ -18,7 +18,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN echo 'alias python=python3' >> ~/.bashrc
 
-
 WORKDIR /app
 COPY jakarnotator/package*.json ./
 

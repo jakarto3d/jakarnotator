@@ -1,6 +1,8 @@
 var express = require("express");
 const redis = require('redis');
-const client = redis.createClient();
+const client = redis.createClient({
+  host: process.env.HOST_REDIS || 'localhost'
+});
 var router = express.Router();
 var bodyParser = require('body-parser');
 

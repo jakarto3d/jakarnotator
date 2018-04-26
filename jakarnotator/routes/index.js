@@ -1,7 +1,9 @@
 var express = require('express');
 var fs = require("fs");
 const redis = require('redis');
-const client = redis.createClient();
+const client = redis.createClient({
+  host: process.env.HOST_REDIS || 'localhost'
+});
 var router = express.Router();
 
 
@@ -48,7 +50,7 @@ const get_list_annotations = (req, res) => {
     // Set cache expiration to 1 hour (60 minutes)
     client.setex("list_annotation", 3600, JSON.stringify(annotation_list_for_jstree_format));
 
-    res.send(annotation_list_for_jstree_format);
+    res.send(JSON.stringify(annotation_list_for_jstree_format));
   });
 
 }
@@ -60,6 +62,7 @@ const getCache = (req, res) => {
       console.log("return list_annotation from cache");
       res.send(result);
     } else {
+      console.log("return list_annotation without cache");
       get_list_annotations(req, res);
     }
   });
