@@ -1,3 +1,5 @@
+Need redis server on.
+
 ```
 cd jakarnotator
 npm install
@@ -19,4 +21,10 @@ $env:PORT='80';$env:DEBUG='jakarnotator:*'; npm start
 ```
 docker build -t jakarnotator .
 docker run -it --rm -p 8082:8080 -v ${PWD}/jakarnotator/public/data:/app/public/data jakarnotator
+
+# Prometheus
+# http://localhost:9090
+
+# Graphana (user: admin, password: admin)
+# http://localhost:3000/d/rHeAsGMik/jakarnotator_dashboard?orgId=1
 ```

@@ -16,3 +16,25 @@ services:
     image: "redis"
     ports:
       - "6379"
+
+  prometheus:
+    image: "prom/prometheus"
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    links:
+      - web
+    depends_on:
+      - web
+
+  grafana:
+    image: "grafana/grafana:5.1.0"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    volumes:
+      - ./grafana/provisioning:/provisioning
+    environment:
+      - GF_PATHS_PROVISIONING=/provisioning
