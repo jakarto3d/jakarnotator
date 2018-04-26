@@ -1,5 +1,7 @@
 var express = require('express');
 var fs = require("fs");
+const redis = require('redis');
+const client = redis.createClient();
 var router = express.Router();
 
 
@@ -15,15 +17,15 @@ router.get('/stats/', (req, res, next) => {
 });
 
 
-router.get("/list_annotations", (req, res) => {
+const get_list_annotations = (req, res) => {
   var annotation_file = `public/data/annotation_list.json`;
-
+  
   fs.readFile(annotation_file, "utf8", (err, data) => {
     if (err) throw err;
     var data = JSON.parse(data);
-
+  
     var annotation_list_for_jstree_format = []
-
+  
     data.forEach(category => {
       var new_formated_category = {}
       new_formated_category.id = category.id
@@ -38,12 +40,31 @@ router.get("/list_annotations", (req, res) => {
         new_formated_category.state = { "selected": true }
       }
       new_formated_category.li_attr = { "class": `annotation_class_${category.name}` }
-
+  
       annotation_list_for_jstree_format.push(new_formated_category)
     })
+  
+    // Set the string-key:list_annotation in our cache.
+    // Set cache expiration to 1 hour (60 minutes)
+    client.setex("list_annotation", 3600, JSON.stringify(annotation_list_for_jstree_format));
 
     res.send(annotation_list_for_jstree_format);
   });
-});
+
+}
+
+const getCache = (req, res) => {
+  //Check the cache data from the server redis
+  client.get("list_annotation", (err, result) => {
+    if (result) {
+      console.log("return list_annotation from cache");
+      res.send(result);
+    } else {
+      get_list_annotations(req, res);
+    }
+  });
+}
+
+router.get("/list_annotations", getCache);
 
 module.exports = router;

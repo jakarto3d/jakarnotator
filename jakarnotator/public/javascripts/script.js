@@ -1,7 +1,10 @@
 window.localStorage.clear();
 window.sessionStorage.clear();
 window.sessionStorage.removeItem("editing_polygon");
-// TODO(tofull) Fix when socket receive new data : dont erase current editing, or save it...
+$("input[placeholder]").each(function () {
+    $(this).attr('size', $(this).attr('placeholder').length);
+});
+
 var width;
 var height;
 var scaling;
@@ -436,7 +439,7 @@ $.ajax({
             .jstree({
                 "core": {
                     "check_callback": true,
-                    'data': data,
+                    'data': JSON.parse(data),
                     "multiple": false,
                 },
                 "types": {
