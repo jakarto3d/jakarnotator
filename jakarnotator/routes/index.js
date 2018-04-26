@@ -4,33 +4,33 @@ var router = express.Router();
 
 
 /* GET home page. */
-router.get('/', function (req, res, next) {
+router.get('/', (req, res, next) => {
   res.render('index', { title: 'Jakarnotator' });
 });
 
-router.get('/stats/', function (req, res, next) {
-  res.render('stats', { title: 'the stat view' });
+
+/* GET stats page. */
+router.get('/stats/', (req, res, next) => {
+  res.render('stats', { title: 'Jakarnotator - Analysis' });
 });
 
 
 router.get("/list_annotations", (req, res) => {
   var annotation_file = `public/data/annotation_list.json`;
 
-  fs.readFile(annotation_file, "utf8", function (err, data) {
+  fs.readFile(annotation_file, "utf8", (err, data) => {
     if (err) throw err;
     var data = JSON.parse(data);
 
     var annotation_list_for_jstree_format = []
 
-    data.forEach(function(category){
+    data.forEach(category => {
       var new_formated_category = {}
       new_formated_category.id = category.id
       if (category.supercategory === "shape"){
         new_formated_category.parent = "#"
       } else {
-        var parent = data.filter(function (item) {
-          return item.name == category.supercategory;
-        })[0];
+        var parent = data.filter(item => item.name == category.supercategory)[0];
         new_formated_category.parent = parent.id
       }
       new_formated_category.text = category.name
