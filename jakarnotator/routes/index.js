@@ -15,7 +15,7 @@ router.get('/', (req, res, next) => {
 
 /* GET stats page. */
 router.get('/stats/', (req, res, next) => {
-  res.render('stats', { title: 'Jakarnotator - Analysis' });
+  res.render('stats', { title: 'Jakarnotator - Statistics' });
 });
 
 

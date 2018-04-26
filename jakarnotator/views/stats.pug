@@ -4,23 +4,11 @@ block head
   meta(charset='UTF-8')
   meta(name='viewport', content='width=device-width, initial-scale=1.0')
   meta(http-equiv='X-UA-Compatible', content='ie=edge')
-  title the stats view
-  link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
-  script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js')
-  script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js')
-  script(src='https://code.jquery.com/ui/1.12.1/jquery-ui.min.js', integrity='sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=', crossorigin='anonymous')
-  script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.js')
   script(src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js')
-  script(src='https://cdn.jsdelivr.net/npm/lodash@4.17.5/lodash.min.js')
   script(src='/scripts/vue-bootstrap-table.js')
 
 
 block content
-  div.container-fluid
-    div.row
-      h1= title
-      p Welcome to #{title}. The dataset annotator tool designed by Loïc Messal for Jakarto.
-
   .container-fluid
     h1 Nombre de masques par image
     #app
