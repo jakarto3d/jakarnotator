@@ -22,32 +22,36 @@ block head
 
 
 block content
-  div.container-fluid
-    div.row
-      h1= title
-      p Welcome to #{title}. The dataset annotator tool designed by Loïc Messal for Jakarto.
-  div.container-fluid
-    div#main.row.equal
-      div.col-sm-8
+  .container-fluid
+    .row
+      .col-sm-8
+        input(type='text', placeholder="Search an image by name")
+      .col-sm-4
+        .row
+          .col-sm-10
+            p
+              | Selected label :
+              span#selected
+          .col-sm-2
+            input#expand_all(type='button', value='Expand All')
+    #main.row.equal
+      .col-sm-8
         #map
-      div.col-sm-4
-        div
-          p
-            | Selected label :
-            span#selected
+      .col-sm-4
         #tree
           ul
-          
-    div.row
 
-      input#next(type='button', value='next image')
-      input#previous(type='button', value='previous image')
-      input#generate_mask(type='button', value='Generate mask')
-      input#help_btn(type='button', value='help')
-      input#expand_all(type='button', value='Expand All')
-      input#search(type='text', placeholder="Search an image by name")
-      a(href="/stats")
-        | Stat page
+    div.row
+      .col-sm-4
+        a#previous
+          i.fas.fa-arrow-left.fa-3x
+      .col-sm-4
+        a#help_btn
+          i.far.fa-question-circle.fa-3x
+      .col-sm-4
+        a#next
+          i.fas.fa-arrow-right.fa-3x
+      //- input#generate_mask(type='button', value='Generate mask', disabled='')
       script(src='/javascripts/script.js')
 
   #help.modal.fade

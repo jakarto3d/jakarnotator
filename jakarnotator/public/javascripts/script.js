@@ -488,57 +488,57 @@ $.ajax({
 });
 
 
-document.getElementById("expand_all").addEventListener("click", function (e) {
-    $treeview.jstree('open_all');
-})
+// document.getElementById("expand_all").addEventListener("click", function (e) {
+//     $treeview.jstree('open_all');
+// })
 
 
-document.getElementById("generate_mask").addEventListener("click", function (e) {
-    console.log("done");
-    var c0 = 0;
-    var c1 = 0;
-    var c2 = 0;
-    // TODO(tofull) Use fetch instead of $.ajax
-    // TODO(tofull) This processing should be on server-side... and doesn't need routes
-    images_list.forEach(function(image){
-        $.ajax({
-            url: `/process/spliter/${image}`,
-            complete: function(){
-                c0++;
-                if (c0 == images_list.length){
-                    console.log("spliter done");
-                    images_list.forEach(function (image) {
-                        $.ajax({
-                            url: `/process/maskconverter/tif/${image}`,
-                            complete: function(){
-                                c1++;
-                                if (c1 == images_list.length){
-                                    console.log("maskconverter tif done");
-                                    images_list.forEach(function (image) {
-                                        $.ajax({
-                                            url: `/process/maskconverter/png/${image}`,
-                                            complete: function () {
-                                                c2++;
-                                                if (c2 == images_list.length) {
-                                                    console.log("maskconverter png done");
-                                                    $.ajax({
-                                                        url: `/process/generate_coco_format`,
-                                                        success: function (data) {
-                                                            console.log(data);
-                                                            console.log("json coco format generated");
-                                                        }
-                                                    })
-                                                }
-                                            }
-                                        })
-                                    })
-                                }
-                        }})})
-                }
-            }
-        })
-    })
-})
+// document.getElementById("generate_mask").addEventListener("click", function (e) {
+//     console.log("done");
+//     var c0 = 0;
+//     var c1 = 0;
+//     var c2 = 0;
+//     // TODO(tofull) Use fetch instead of $.ajax
+//     // TODO(tofull) This processing should be on server-side... and doesn't need routes
+//     images_list.forEach(function(image){
+//         $.ajax({
+//             url: `/process/spliter/${image}`,
+//             complete: function(){
+//                 c0++;
+//                 if (c0 == images_list.length){
+//                     console.log("spliter done");
+//                     images_list.forEach(function (image) {
+//                         $.ajax({
+//                             url: `/process/maskconverter/tif/${image}`,
+//                             complete: function(){
+//                                 c1++;
+//                                 if (c1 == images_list.length){
+//                                     console.log("maskconverter tif done");
+//                                     images_list.forEach(function (image) {
+//                                         $.ajax({
+//                                             url: `/process/maskconverter/png/${image}`,
+//                                             complete: function () {
+//                                                 c2++;
+//                                                 if (c2 == images_list.length) {
+//                                                     console.log("maskconverter png done");
+//                                                     $.ajax({
+//                                                         url: `/process/generate_coco_format`,
+//                                                         success: function (data) {
+//                                                             console.log(data);
+//                                                             console.log("json coco format generated");
+//                                                         }
+//                                                     })
+//                                                 }
+//                                             }
+//                                         })
+//                                     })
+//                                 }
+//                         }})})
+//                 }
+//             }
+//         })
+//     })
+// })
 
 
 $("#search").change(function(e){
