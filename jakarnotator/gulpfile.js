@@ -6,10 +6,8 @@ var nodemon = require('gulp-nodemon');
 
 var EXPOSED_PORT = process.env.PORT || 8080
 var SYNC_PORT = process.env.SYNCPORT || 8081
-console.log(EXPOSED_PORT)
-gulp.task('default', ['browser-sync'], function () {
 
-});
+gulp.task('default', ['browser-sync'], function () {});
 
 gulp.task('browser-sync', ['nodemon'], function () {
     browserSync.init(null, {
@@ -19,6 +17,7 @@ gulp.task('browser-sync', ['nodemon'], function () {
         port: SYNC_PORT,
     });
 });
+
 gulp.task('nodemon', function (cb) {
     var started = false;
     return nodemon({
