@@ -36,6 +36,8 @@ var searchbar = new Vue({
     }
 });
 
+
+var index_image;
 var width;
 var height;
 var scaling;
@@ -50,7 +52,7 @@ var DONTSAVE = false
 var images_list;
 var img = new Image();
 
-var map = L.map('map', { editable: true, attributionControl: false}).setView([0.0, 0.0], 11);
+var map = L.map('map', { editable: true, attributionControl: false }).setView([0.0, 0.0], 11);
 
 
 L.NewPolygonControl = L.Control.extend({
@@ -111,7 +113,6 @@ function save_polygon(e) {
                     dataset[img.src].push(data);
                 }
             }
-    
         });
     
         window.sessionStorage.setItem("dataset", JSON.stringify(dataset));
@@ -129,7 +130,6 @@ function save_polygon(e) {
             console.log('Problème de synchronisation...');
         });
     }
-
 }
 
 map.on('editable:drawing:end', function (e) {
@@ -332,7 +332,6 @@ var display_polygons = function(){
                         l.setStyle({ fillColor: style.color });
                     }
                 });
-
             }
             if (window.sessionStorage.getItem("editing_polygon")){
                 var geojsonFeature = JSON.parse(window.sessionStorage.getItem("editing_polygon"))
@@ -361,7 +360,6 @@ var display_polygons = function(){
                     }
                 });
             }
-
             console.log(`found : ${dataset[img.src].length} existing polygon for this image ${img.src}`)
         }
     });
@@ -406,7 +404,6 @@ socket.on('connect', function () {
             map.editTools.editLayer.clearLayers();
             
             display_polygons();
-    
     }
     
     socket.on('should_refresh_json', function (data) {
@@ -424,7 +421,6 @@ socket.on('connect', function () {
         display_polygons();
     })
 });
-var index_image;
 index_image = parseInt(window.sessionStorage["index_image"]) || 0;
 
 
