@@ -1,5 +1,5 @@
-window.localStorage.clear();
-window.sessionStorage.clear();
+// window.localStorage.clear();
+// window.sessionStorage.clear();
 window.sessionStorage.removeItem("editing_polygon");
 $("input[placeholder]").each(function () {
     $(this).attr('size', $(this).attr('placeholder').length);
@@ -11,16 +11,26 @@ var searchbar = new Vue({
     data: {
         options: [],
         selected: null,
+        current: null,
     },
     methods: {
-        if_selected_change: (event) => {
-            if (event) {
-                map.dragging.disable();
-                map.off('drag');
-                socket.emit('room-leave', event.label);
+        change_image: function(option_item){
+            map.dragging.disable();
+            map.off('drag');
+            socket.emit('room-leave', option_item.label);
+            if (image){
                 map.removeLayer(image);
-                img.src = '/data/images/' + event.label;
-                window.sessionStorage.setItem("index_image", event.id);
+            }
+            index_image = option_item.id;
+            img.src = '/data/images/' + option_item.label;
+            window.sessionStorage.setItem("index_image", option_item.id);
+        },
+        if_selected_change: function(event){
+            // N’utilisez pas les fonctions fléchées sur une propriété ou fonction de rappel d’une instance
+            // Comme les fonctions fléchées sont liées au contexte parent, this ne sera pas l’instance de Vue
+            // https://fr.vuejs.org/v2/guide/instance.html
+            if (event) {
+                this.change_image(event)
             }
         },
     }
@@ -361,6 +371,7 @@ var socket = io();
 socket.on('connect', function () {
     img.onload = function () {
 
+            searchbar.current = searchbar.options.find(item => item.label === images_list[index_image])
             socket.emit('room-join', images_list[index_image]);
             
             width = this.width;
@@ -422,7 +433,7 @@ document.getElementById("next").addEventListener("click", function (e) {
     if (index_image >= images_list.length) {
         index_image = 0;
     }
-    searchbar.selected = searchbar.options.find(item => item.label === images_list[index_image]);
+    searchbar.change_image(searchbar.options.find(item => item.label === images_list[index_image]));
 })
 
 document.getElementById("previous").addEventListener("click", function (e) {
@@ -430,7 +441,8 @@ document.getElementById("previous").addEventListener("click", function (e) {
     if (index_image < 0) {
         index_image = images_list.length - 1;
     }
-    searchbar.selected = searchbar.options.find(item => item.label === images_list[index_image]);
+
+    searchbar.change_image(searchbar.options.find(item => item.label === images_list[index_image]));
 })
 
 document.getElementById("help_btn").addEventListener("click", function (e) {

@@ -24,10 +24,12 @@ block content
   .container-fluid
     .row
       .col-sm-8
-          .row
+          .row#searchbar
+            .col-sm-4
+              p(v-if="current && current !== null")
+                | Current image : {{ current.label }}
             .col-sm-4.col-sm-offset-4
-              #searchbar
-                v-select(v-model='selected', :options='options', @input="if_selected_change", placeholder="Search an image by its name")
+              v-select(v-model='selected', :options='options', @input="if_selected_change", placeholder="Search an image by its name")
       .col-sm-4
         .row
           .col-sm-10
