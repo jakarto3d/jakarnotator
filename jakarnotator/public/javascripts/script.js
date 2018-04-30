@@ -5,6 +5,27 @@ $("input[placeholder]").each(function () {
     $(this).attr('size', $(this).attr('placeholder').length);
 });
 
+Vue.component('v-select', VueSelect.VueSelect)
+var searchbar = new Vue({
+    el: '#searchbar',
+    data: {
+        options: [],
+        selected: null,
+    },
+    methods: {
+        if_selected_change: (event) => {
+            if (event) {
+                map.dragging.disable();
+                map.off('drag');
+                socket.emit('room-leave', event.label);
+                map.removeLayer(image);
+                img.src = '/data/images/' + event.label;
+                window.sessionStorage.setItem("index_image", event.id);
+            }
+        },
+    }
+});
+
 var width;
 var height;
 var scaling;
@@ -331,7 +352,7 @@ var display_polygons = function(){
                 });
             }
 
-            console.log("found : " + dataset[img.src].length + ' existing polygon for this image')
+            console.log(`found : ${dataset[img.src].length} existing polygon for this image ${img.src}`)
         }
     });
 }
@@ -341,7 +362,6 @@ socket.on('connect', function () {
     img.onload = function () {
 
             socket.emit('room-join', images_list[index_image]);
-            
             
             width = this.width;
             height = this.height;
@@ -398,31 +418,19 @@ index_image = parseInt(window.sessionStorage["index_image"]) || 0;
 
 
 document.getElementById("next").addEventListener("click", function (e) {
-    map.dragging.disable();
-    map.off('drag');
-    socket.emit('room-leave', images_list[index_image]);
-
     index_image = index_image + 1;
     if (index_image >= images_list.length) {
         index_image = 0;
     }
-    map.removeLayer(image);
-    img.src = '/data/images/' + images_list[index_image];
-    window.sessionStorage.setItem("index_image", index_image);
+    searchbar.selected = searchbar.options.find(item => item.label === images_list[index_image]);
 })
 
 document.getElementById("previous").addEventListener("click", function (e) {
-    map.dragging.disable();
-    map.off('drag');
-    socket.emit('room-leave', images_list[index_image]);
-
     index_image = index_image - 1;
     if (index_image < 0) {
         index_image = images_list.length - 1;
     }
-    map.removeLayer(image);
-    img.src = '/data/images/' + images_list[index_image];
-    window.sessionStorage.setItem("index_image", index_image);
+    searchbar.selected = searchbar.options.find(item => item.label === images_list[index_image]);
 })
 
 document.getElementById("help_btn").addEventListener("click", function (e) {
@@ -480,6 +488,7 @@ $.ajax({
                     type: 'GET',
                     success: function (data) {
                         images_list = JSON.parse(data);
+                        searchbar.options = images_list.map((x, id) => { return { id: id, label: x }; })
                         img.src = '/data/images/' + images_list[index_image];
                     }
                 })
@@ -543,18 +552,3 @@ $.ajax({
 //     })
 // })
 
-
-$("#search").change(function(e){
-    map.dragging.disable();
-    map.off('drag');
-    socket.emit('room-leave', images_list[index_image]);
-
-    var index_image_temp = images_list.indexOf($("#search").val());
-    if (index_image_temp !== -1){
-        console.log(index_image);
-        index_image = index_image_temp
-        map.removeLayer(image);
-        img.src = '/data/images/' + images_list[index_image];
-        window.sessionStorage.setItem("index_image", index_image);
-    }
-})

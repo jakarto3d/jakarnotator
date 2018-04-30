@@ -1,5 +1,10 @@
 body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  margin-bottom: 3em;
+}
+
+.footer_compensator {
+  min-height: 2em;
 }
 
 .footer {
