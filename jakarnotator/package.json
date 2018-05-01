@@ -20,9 +20,7 @@
     "pug": "2.0.0-beta11",
     "redis": "^2.8.0",
     "sharp": "^0.20.1",
-    "socket.io": "^2.1.0",
-    "vue2-bootstrap-table": "^0.2.2", // TODO(tofull) Remove this or bellow package
-    "vue2-bootstrap-table2": "^1.1.8" // TODO(tofull) Remove this or above package
+    "socket.io": "^2.1.0"
   },
   "devDependencies": {
     "browser-sync": "^2.23.6",

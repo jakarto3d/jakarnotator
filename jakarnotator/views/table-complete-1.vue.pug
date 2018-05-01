@@ -1,0 +1,31 @@
+// from https://bootstrap-vue.js.org/docs/components/table#complete-example
+b-container(fluid='')
+  // User Interface controls
+  b-row
+    b-col(md='5')
+      b-form-group.mb-0(horizontal='', label='Filter')
+        b-input-group
+          b-form-input(v-model='filter', placeholder='Type to Search')
+            b-input-group-append
+              b-btn(:disabled='!filter', @click="filter = ''") Clear
+    b-col(md='5', offset='2')
+      b-form-group.mb-0(horizontal='', label='Sort')
+        b-input-group
+          b-form-select(v-model='sortBy', :options='sortOptions')
+            option(slot='first', :value='null') -- none --
+          b-form-select(:disabled='!sortBy', v-model='sortDesc', slot='append')
+            option(:value='false') Asc
+            option(:value='true') Desc
+
+  // Main table element
+  b-table(show-empty='', stacked='md', :items='items', :fields='fields', :current-page='currentPage', :per-page='perPage', :filter='filter', :sort-by.sync='sortBy', :sort-desc.sync='sortDesc', @filtered='onFiltered')
+    template(slot='name', slot-scope='row') {{row.value}}
+    template(slot='number_masks', slot-scope='row') {{row.value}}
+
+  // User Interface controls
+  b-row
+    b-col.my-1(md='3')
+      b-form-group.mb-0(horizontal='', label='Per page')
+        b-form-select(:options='pageOptions', v-model='perPage')
+    b-col.my-1(md='6', offset='2')
+      b-pagination.my-0(:total-rows='totalRows', :per-page='perPage', v-model='currentPage')

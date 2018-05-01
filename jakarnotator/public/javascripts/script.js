@@ -460,7 +460,7 @@ $.ajax({
                 },
                 "types": {
                     "default": {
-                        "icon": "glyphicon glyphicon-ok"
+                        "icon": "fas fa-check"
                     }
                 },
                 "plugins": ["dnd", "state", "types"]

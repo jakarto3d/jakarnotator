@@ -15,7 +15,7 @@ block head
 
   link(rel='stylesheet', href='http://static.jstree.com/3.0.0/assets/dist/themes/default/style.min.css')
   script(src='http://static.jstree.com/3.0.0/assets/dist/jstree.min.js')
-  
+
   script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.js')
   link(rel='stylesheet', href='/stylesheets/style.css')
 
@@ -24,32 +24,36 @@ block content
   .container-fluid
     .row
       .col-sm-8
-          .row#searchbar
-            .col-sm-4
-              p(v-if="current && current !== null")
-                | Current image : {{ current.label }}
-            .col-sm-4.col-sm-offset-4
-              v-select(v-model='selected', :options='options', @input="if_selected_change", placeholder="Search an image by its name")
+        .row#searchbar.equal.my-md-2
+          //- (style="margin:0.5em;")
+          .col-sm-4.vcenter.custom_vcenter
+            span(v-if="current && current !== null")
+              | Current image : {{ current.label }}
+          .col-sm-4.vcenter.custom_vcenter
+            v-select(v-model='selected', :options='options', @input="if_selected_change", placeholder="Search an image by its name")
+          .col-sm-4.text-right.vcenter.custom_vcenter
+            span(v-if="options")
+              | # Images loaded : {{ options.length }}
       .col-sm-4
-        .row
-          .col-sm-10
-            p
+        .row.equal.my-md-3
+          .col-sm-10.vcenter.custom_vcenter
+            span
               | Selected label :
               span#selected
-          .col-sm-2
+          .col-sm-2.vcenter.custom_vcenter
             input#expand_all(type='button', value='Expand All')
 
     #main.row.equal
       .col-sm-8
         #map
         .row
-          .col-xs-4
+          .col-4
             a#previous
               i.fas.fa-arrow-left.fa-3x
-          .col-xs-4.text-center
+          .col-4.text-center
             a#help_btn
               i.far.fa-question-circle.fa-3x
-          .col-xs-4.text-right
+          .col-4.text-right
             a#next
               i.fas.fa-arrow-right.fa-3x
       .col-sm-4
@@ -58,6 +62,6 @@ block content
 
       //- input#generate_mask(type='button', value='Generate mask', disabled='')
 
+  include modal.pug
   script(src='/javascripts/script.js')
 
-  include modal.pug

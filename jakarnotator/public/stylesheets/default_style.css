@@ -32,9 +32,20 @@ a {
 }
 
 .row.equal {
+  display: -webkit-box;
   display: -webkit-flex;
-  display: flex;
+  display: -ms-flexbox;
+  display:         flex;
   flex-wrap: wrap;
+}
+
+.custom_vcenter{
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display:         flex;
+  flex-direction:column;
+  justify-content:center;
 }
 
 #main {

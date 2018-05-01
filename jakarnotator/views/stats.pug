@@ -4,32 +4,28 @@ block head
   meta(charset='UTF-8')
   meta(name='viewport', content='width=device-width, initial-scale=1.0')
   meta(http-equiv='X-UA-Compatible', content='ie=edge')
-  script(src='/vendors/vue-bootstrap-table.js')
 
 
 block content
   .container-fluid
-    h1 Nombre de masques par image
-    #app
-      .row
-        .col-sm-12
-          button.btn.btn-default(@click='toggleFilter') Toggle Filter
-          button.btn.btn-default(@click='togglePicker') Toggle Column Picker
-          button.btn.btn-default(@click='togglePagination') Toggle Pagination
-        br
-        br
-        vue-bootstrap-table(:columns='columns', :values='values', :show-filter='showFilter', :show-column-picker='showPicker', :paginated='paginated', :multi-column-sortable='multiColumnSortable')
+    h2 Nombre de masques par image
+    #mask_par_image
+      .container-fluid
+        .row
+          .col-8.offset-1
+            include table-complete-1.vue.pug
+          .col-2
+            span
+              | # images loaded : {{ items.length }}
 
-  .container-fluid
-    h1 Nombre de masques par catégorie
-    #app_mask
-      .row
-        .col-sm-12
-          button.btn.btn-default(@click='toggleFilter') Toggle Filter
-          button.btn.btn-default(@click='togglePicker') Toggle Column Picker
-          button.btn.btn-default(@click='togglePagination') Toggle Pagination
-        br
-        br
-        vue-bootstrap-table(:columns='columns', :values='values', :show-filter='showFilter', :show-column-picker='showPicker', :paginated='paginated', :multi-column-sortable='multiColumnSortable')
+    h2 Nombre de masques par catégorie
+    #mask_par_categories
+      .container-fluid
+        .row
+          .col-8.offset-1
+            include table-complete-1.vue.pug
+          .col-2
+            span
+              | # Total masks : {{ total() }}
 
   script(src='/javascripts/get_stats.js')
