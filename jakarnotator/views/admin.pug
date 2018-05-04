@@ -1,0 +1,74 @@
+extends layout
+
+block head
+  meta(charset='UTF-8')
+  meta(name='viewport', content='width=device-width, initial-scale=1.0')
+  meta(http-equiv='X-UA-Compatible', content='ie=edge')
+  title Document
+
+  link(rel='stylesheet', href='/stylesheets/style.css')
+
+
+block content
+  .container-fluid.mt-4
+    .row
+      .col-8.offset-2
+        .w-100 Legend:
+          span.d-flex-inline.justify-content-around
+            button.btn.btn-danger.mx-2.mr-auto Not yet implemented
+            button.btn.btn-warning.mx-2.mr-auto Coming soon
+              span.small.text-muted  (a POC has been done)
+            button.btn.btn-success.mx-2.mr-auto Working
+    .row
+      .col-lg-6.offset-lg-3
+        .card-deck.my-5
+          .card
+            .card-body
+              h5.card-title Annotation list manager
+              p.card-text.px-lg-5
+                | Here you can manage or update the annotation list. Because your classes are yours.
+            .card-footer.text-center
+              button.btn.btn-danger Go to the manager
+          .card
+            .card-body
+              h5.card-title COCO-format masks generator
+              p.card-text.px-lg-5
+                | Here you can generate the masks in COCO-format for training your machine learning algorithms.
+            .card-footer.d-flex.flex-column.flex-xl-row.justify-content-around
+                button.btn.btn-warning.my-2.my-xl-0 Generate masks
+                button.btn.btn-warning.my-2.my-xl-0 Download the latest
+        .card-deck.my-5
+          .card
+            .card-body
+              h5.card-title Statistics page
+              p.card-text.px-lg-5
+                | Have a look to the progression of your annotations.
+            .card-footer.d-flex.justify-content-around
+              a(href="/stats/")
+                button.btn.btn-success Go to the statistics page
+          .card
+            .card-body
+              h5.card-title Traffic dashboard
+              p.card-text.px-lg-5
+                | Here you can have a view to analyse your incoming traffic. Jakarnotator collects some metrics thanks to Prometheus and we provide for you a Grafana dashboard.
+
+            .card-footer
+              .d-flex.justify-content-around
+                button.btn.btn-warning Go to your traffic dashboard
+              .text-muted.text-center.mt-1
+                | (username:
+                span.text-dark  admin
+                | , password:
+                span.text-dark  admin
+                | )
+
+          
+        .card-deck.my-5
+          .card.border-info
+            .card-body.text-center
+              h5.card-title Thanks Jakarto
+            .card-footer.d-flex.justify-content-around
+              a(target="_blank", href="https://twitter.com/intent/tweet?text=Thanks%20Jakarto%20for%20this%20open%20source%20image%20annotation%20tool%20%21&related=Jakarto3D%3A_Tofull&via=Jakarto3D&hashtags=Jakarnotator")
+                button.btn.btn-info Say a big thanks to Jakarto.
+          
+          

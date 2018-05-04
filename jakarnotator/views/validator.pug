@@ -1,0 +1,42 @@
+extends layout
+
+block head
+  meta(charset='UTF-8')
+  meta(name='viewport', content='width=device-width, initial-scale=1.0')
+  meta(http-equiv='X-UA-Compatible', content='ie=edge')
+  title Document
+
+  link(rel='stylesheet', href='/stylesheets/style.css')
+
+  style.
+    body {
+      background-color:rgba(128, 128, 128, 0.9);
+    }
+
+block content
+  .container-fluid
+    .row.mb-5.mt-2
+      .col-12.text-center
+        h1 Validator tool page
+
+    .row.mb-2
+      .col-6.offset-3.text-center
+        p Is this polygon describe a
+          b.text-primary  car
+          |  ?
+
+        .position-relative
+          img(src="/images/validator_tool_sample.png", alt="validator tool sample", sizes="100vw").img-fluid
+          .position-absolute(style="top:0;height:100%;width:100%;")
+            .container(style="height:100%;")
+              .row(style='background:transparent; height:100%;display:flex;align-items:center;')
+                .col-12.text-center
+                  p(style="transform: rotate(-35deg);font-size: 4vw;color:white") Coming soon !
+
+    .row
+      .col-2.offset-3
+        button(type="button", title="Swap to left or press the left arrow").btn.btn-danger No :(
+      .col-2.text-center
+        p Current score: +7 (over 10 votes)
+      .col-2.text-right
+        button.btn.btn-success(type="button", title="Swap to right or press the right arrow") Yes :)

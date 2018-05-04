@@ -1,0 +1,89 @@
+extends layout
+
+block head
+  meta(charset='UTF-8')
+  meta(name='viewport', content='width=device-width, initial-scale=1.0')
+  meta(http-equiv='X-UA-Compatible', content='ie=edge')
+  title Document
+
+  link(rel='stylesheet', href='/stylesheets/style.css')
+
+
+block content
+  .container.my-4
+    .row
+      .col-8.offset-2.text-justify
+        .card.my-5
+          .card-header
+            | Why is it called Jakarnotator ?
+          .card-body
+            .card-text.px-5
+              p
+                | It is simply the contraction of the purpose of the project 
+                em Annotator
+                |  and 
+                em Jakarto
+                | .
+        
+        .card.my-5
+          .card-header
+            | What is Jakarto ?
+          .card-body
+            .card-text.px-5
+              p
+                | Jakarto is a startup in Montreal City (Qc, Canada). It aims to collect urban environment geodata thanks to cutting-edge technologies (lidars, 4K cameras). 
+              p 
+                | Jakarto is propulsed by JLR, a company which analyze millions of property data all over North America and transform them into business intelligence for financial institutions, government agencies, private companies and real estate professionals.
+        
+        .card.my-5
+          .card-header
+            | Why did we build a such tool ?
+          .card-body
+            .card-text.px-5
+              p We collect a huge amont of data each data with our trucks. To extract valuable information for our customers, we needed an automatic, robust and efficient data processing. 
+              p Today, one of the best solution to deal with is using machine learning and deep learning. These algorithms need tons of groundtruth data to extract by themselves the concept of cars, three, people, building, traffic signs or another interesting class during a step called training. 
+              p The more we annotate images, the more the training give us good results. Then, we used the data model to detect instance object location. Finally, we are selling this service.
+              p Our algorithms had been training on famous public dataset like COCO and Cityscape. Because of the high quality of our data comparing to the training dataset, the results were almost good, but not as good as it can. So we needed to train the model again, yet on our data. That means annotate thousands of images with our own classes. 
+              p Because we didn't find a tool to annotate our data as fast as we wanted (understanding price, data privacy, data ownership and annotation-style (instance segmentation for us)), we decided to build our. Here is Jakarnotator.
+        
+        .card.my-5
+          .card-header
+            | Why did we open source it ?
+          .card-body
+            .card-text.px-5
+              ul
+                li Because Machine Learning and Deep Learning are so trendy today, 
+                li because of the lack of public 
+                  span.text-muted (and almost free)
+                  |  tools to establish a groundtruth, 
+                li because we used open source IA algorithms as inspiration for free 
+                  span.text-muted (resulting of years of research), 
+                li because we cannot build a such service alone 
+                  span.text-muted with induced knowledge acquisition bottleneck
+                li and because nowadays we make business over it, 
+              p For all of those raisons, we decided to open source Jakarnotator to help the data science community. This is our kind of payback for thanks all the people/company which build things. Jakarnotator is our way to contribute and serve this community.
+        
+        
+        .card.my-5
+          .card-header
+            | Responsabilities
+          .card-body
+            .card-text.px-5
+              p We decline all responsability of the usage of Jakarnotator to establish your training. All is good if you make business with the annoted data, but we are not responsable if your detection fails because of your training or erroned training dataset.
+        
+        
+        .card.my-5
+          .card-header
+            | Thanks
+          .card-body
+            .card-text.px-5
+              p We released the first version of Jakarnotator when it was still raw. Your advices, tips, expertise, fixes, usecase and feedback help us to provide this easy-to-use annotation tool we build together.
+              p We want to thanks all the contributors and people we help to build Jakarnotator.
+              ul
+                li the community
+                  p Without you, the community, many bugs will not be fixed yet, and many features will never been introduced. Thanks for your contributions! Keep going and share!
+                li Jakarto
+                  p Thanks for your support.
+                li Loic Messal (@tofull)
+                  p He is the initiator of Jakarnotator, and futhermore, the author of the initial raw version which has been used to make our first steps. He is also the guy who insists for Jakarto to entering in the open source community. Thanks to him !
+        

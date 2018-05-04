@@ -451,11 +451,14 @@ $.ajax({
     url: "/list_annotations",
     type: 'GET',
     success: function (data) {
+        if (typeof data !== Array){
+            data = JSON.parse(data);
+        }
         $treeview
             .jstree({
                 "core": {
                     "check_callback": true,
-                    'data': JSON.parse(data),
+                    'data': data,
                     "multiple": false,
                 },
                 "types": {

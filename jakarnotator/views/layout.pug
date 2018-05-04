@@ -21,27 +21,31 @@ html
     script(src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js')
 
     // vue-bootstrap
-    link(type='text/css', rel='stylesheet', href='//unpkg.com/bootstrap/dist/css/bootstrap.min.css')
+    //- link(type='text/css', rel='stylesheet', href='//unpkg.com/bootstrap/dist/css/bootstrap.min.css')
     link(type='text/css', rel='stylesheet', href='//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css')
     script(src='//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js')
 
     // custom
     link(rel='stylesheet', href='/stylesheets/default_style.css')
-    script(src='/javascripts/default.js')
 
     block head
 
   body
-    block nav
-      nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.sticky-top.w-100
-        .navbar-header
-          a.navbar-brand(href='/') Jakarnotator
-          button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNavDropdown', aria-controls='navbarNavDropdown', aria-expanded='false', aria-label='Toggle navigation')
-            span.navbar-toggler-icon
-        .collapse.navbar-collapse#navbarNavDropdown
-          .navbar-nav
-            a.nav-item.nav-link(href='/') Editor
-            a.nav-item.nav-link(href='/stats') Stats
+    block header
+      header
+        block nav
+          nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.sticky-top.w-100
+            .navbar-header
+              a.navbar-brand(href='/') Jakarnotator
+              button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarNavDropdown', aria-controls='navbarNavDropdown', aria-expanded='false', aria-label='Toggle navigation')
+                span.navbar-toggler-icon
+            .collapse.navbar-collapse.justify-content-between#navbarNavDropdown
+              .navbar-nav
+                a.nav-item.nav-link(href='/') Editor
+                a.nav-item.nav-link(href='/validator') Validator
+              .navbar-nav
+                a.nav-item.nav-link(href='/admin') Admin
+                a.nav-item.nav-link(href='/about') About
 
     block content
 
@@ -56,3 +60,5 @@ html
               | with 
               i.fas.fa-heart
               | .
+
+      script(src='/javascripts/default.js')
