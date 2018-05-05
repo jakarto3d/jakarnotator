@@ -35,13 +35,13 @@ block content
             span(v-if="options")
               | # Images loaded : {{ options.length }}
       .col-sm-4
-        .row.equal.my-md-3
-          .col-sm-10.vcenter.custom_vcenter
+        .row.equal.my-md-2
+          .col-sm-8.vcenter.custom_vcenter
             span
-              | Selected label :
+              | Selected label : 
               span#selected
-          .col-sm-2.vcenter.custom_vcenter
-            input#expand_all(type='button', value='Expand All')
+          .col-sm-4.vcenter.custom_vcenter
+            button#expand_all.btn.btn-light(type="button").font-weight-light Expand All
 
     #main.row.equal
       .col-sm-8
