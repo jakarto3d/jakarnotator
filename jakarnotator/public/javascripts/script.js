@@ -411,14 +411,21 @@ socket.on('connect', function () {
     }
     
     socket.on('should_refresh_json', function (data) {
+        console.log(map.editTools.featuresLayer.getLayers())
         map.editTools.featuresLayer.getLayers().forEach(function (l) {
-            if (l.editEnabled()) {
-                // If current polygon is editing
-                // Save current polygon in window.sessionStorage
-                // display polygons
-                // in display_polygons, load the saved polygon and give it edition mode 
-                if (l.toGeoJSON().geometry.coordinates[0].length > 3){
-                    window.sessionStorage.setItem("editing_polygon", JSON.stringify(l.toGeoJSON()))
+            if (l instanceof L.LayerGroup) {
+                l.getLayers().forEach(function (layer) {
+                    if (layer.editEnabled()) {
+                        if (layer.toGeoJSON().geometry.coordinates[0].length > 3) {
+                            window.sessionStorage.setItem("editing_polygon", JSON.stringify(layer.toGeoJSON()))
+                        }
+                    }
+                })
+            } else {
+                if (l.editEnabled()) {
+                    if (l.toGeoJSON().geometry.coordinates[0].length > 3) {
+                        window.sessionStorage.setItem("editing_polygon", JSON.stringify(l.toGeoJSON()))
+                    }
                 }
             }
         })
