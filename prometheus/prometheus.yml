@@ -10,4 +10,4 @@ scrape_configs:
   # scheme defaults to 'http'.
   - job_name: 'jakarnotator_metrics'
     static_configs:
-      - targets: ['web:8080', '127.0.0.1:8080']
+      - targets: ['jakarnotator:8080', '127.0.0.1:8080']
