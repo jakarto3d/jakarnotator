@@ -19,7 +19,9 @@ b-container(fluid='')
 
   // Main table element
   b-table(show-empty='', stacked='md', :items='items', :fields='fields', :current-page='currentPage', :per-page='perPage', :filter='filter', :sort-by.sync='sortBy', :sort-desc.sync='sortDesc', @filtered='onFiltered')
-    template(slot='name', slot-scope='row') {{row.value}}
+    template(slot='image_name', slot-scope='row') 
+      <a v-bind:href="'/?image='+ row.value" style="color: inherit;"> {{row.value}} </a>
+    template(slot='category_name', slot-scope='row') {{row.value}}
     template(slot='number_masks', slot-scope='row') {{row.value}}
 
   // User Interface controls
