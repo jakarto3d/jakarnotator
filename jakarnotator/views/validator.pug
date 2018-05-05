@@ -20,8 +20,8 @@ block content
         h1 Validator tool page
 
     .row.mb-2
-      .col-6.offset-3.text-center
-        p Is this polygon describe a
+      .col-10.offset-1.col-lg-6.offset-lg-3.text-center
+        p Does this polygon fit a
           b.text-primary  car
           |  ?
 
@@ -34,9 +34,11 @@ block content
                   p(style="transform: rotate(-35deg);font-size: 4vw;color:white") Coming soon !
 
     .row
-      .col-2.offset-3
-        button(type="button", title="Swap to left or press the left arrow").btn.btn-danger No :(
-      .col-2.text-center
-        p Current score: +7 (over 10 votes)
-      .col-2.text-right
-        button.btn.btn-success(type="button", title="Swap to right or press the right arrow") Yes :)
+      .col-2.col-lg-1.offset-lg-3
+        button(type="button", title="Swap to left or press the left arrow").btn.btn-block.btn-danger 
+          span(style="white-space:normal;") No :(
+      .col-8.col-lg-4.text-center
+        p Current score: +7 (based on 10 votes)
+      .col-2.col-lg-1.text-right
+        button.btn.btn-block.btn-success(type="button", title="Swap to right or press the right arrow")
+          span(style="white-space:normal;") Yes :)

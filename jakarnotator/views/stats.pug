@@ -7,26 +7,30 @@ block head
 
 
 block content
-  .container-fluid
-    h2 Nombre de masques par image
-    #mask_par_image
-      .container-fluid
-        .row
-          .col-8.offset-1
-            include table-complete-1.vue.pug
-          .col-2
-            span
-              | # images loaded : {{ items.length }}
+  .container-fluid.my-4
+    .row
+      .col-12
+        h2.ml-2 Nombre de masques par image
+        #mask_par_image
+          .container-fluid
+            .row
+              .col-8.offset-1
+                include table-complete-1.vue.pug
+              .col-2
+                span
+                  | # images loaded : {{ items.length }}
 
     hr
-    h2 Nombre de masques par catégorie
-    #mask_par_categories
-      .container-fluid
-        .row
-          .col-8.offset-1
-            include table-complete-1.vue.pug
-          .col-2
-            span
-              | # Total masks : {{ total() }}
+    .row
+      .col-12
+        h2.ml-2 Nombre de masques par catégorie
+        #mask_par_categories
+          .container-fluid
+            .row
+              .col-8.offset-1
+                include table-complete-1.vue.pug
+              .col-2
+                span
+                  | # Total masks : {{ total() }}
 
   script(src='/javascripts/get_stats.js')

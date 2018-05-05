@@ -4,7 +4,7 @@ block head
   meta(charset='UTF-8')
   meta(name='viewport', content='width=device-width, initial-scale=1.0')
   meta(http-equiv='X-UA-Compatible', content='ie=edge')
-  title Document
+  title Administration page
 
   link(rel='stylesheet', href='/stylesheets/style.css')
 
@@ -12,13 +12,14 @@ block head
 block content
   .container-fluid.mt-4
     .row
-      .col-8.offset-2
-        .w-100 Legend:
-          span.d-flex-inline.justify-content-around
+      .col-12.col-lg-6.offset-lg-3
+        p.text-center Legend:
+        div.d-flex-inline.justify-content-around.text-center
             button.btn.btn-danger.mx-2.mr-auto Not yet implemented
             button.btn.btn-warning.mx-2.mr-auto Coming soon
               span.small.text-muted  (a POC has been done)
             button.btn.btn-success.mx-2.mr-auto Working
+
     .row
       .col-lg-6.offset-lg-3
         .card-deck.my-5
@@ -26,23 +27,26 @@ block content
             .card-body
               h5.card-title Annotation list manager
               p.card-text.px-lg-5
-                | Here you can manage or update the annotation list. Because your classes are yours.
+                | Manage the annotation list, because your classes are yours.
             .card-footer.text-center
               button.btn.btn-danger Go to the manager
           .card
             .card-body
               h5.card-title COCO-format masks generator
               p.card-text.px-lg-5
-                | Here you can generate the masks in COCO-format for training your machine learning algorithms.
+                | Export the masks in COCO-format to train your machine learning algorithms.
             .card-footer.d-flex.flex-column.flex-xl-row.justify-content-around
                 button.btn.btn-warning.my-2.my-xl-0 Generate masks
-                button.btn.btn-warning.my-2.my-xl-0 Download the latest
+                //- TODO(tofull) Change this hardcoded link to a call api.
+                a(href="/data/instances_shape_jakartotrain2018.json")
+                  button.btn.btn-success.my-2.my-xl-0 Download the latest
+
         .card-deck.my-5
           .card
             .card-body
               h5.card-title Statistics page
               p.card-text.px-lg-5
-                | Have a look to the progression of your annotations.
+                | Check the progression of your annotations.
             .card-footer.d-flex.justify-content-around
               a(href="/stats/")
                 button.btn.btn-success Go to the statistics page
@@ -50,8 +54,9 @@ block content
             .card-body
               h5.card-title Traffic dashboard
               p.card-text.px-lg-5
-                | Here you can have a view to analyse your incoming traffic. Jakarnotator collects some metrics thanks to Prometheus and we provide for you a Grafana dashboard.
-
+                | Analyse your incoming traffic. Jakarnotator collects some metrics thanks to Prometheus.
+              p.card-text.px-lg-5
+                | We designed a Grafana dashboard for you.
               p.card-text.text-center.text-muted.small only available if grafana is deployed
             .card-footer
               .d-flex.justify-content-around
@@ -64,7 +69,6 @@ block content
                 span.text-dark  admin
                 | )
 
-          
         .card-deck.my-5
           .card.border-info
             .card-body.text-center
