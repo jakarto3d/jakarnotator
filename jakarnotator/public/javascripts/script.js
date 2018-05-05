@@ -15,6 +15,10 @@ var searchbar = new Vue({
     },
     methods: {
         change_image: function(option_item){
+            if (! this.options.includes(option_item)){
+                // the given option_item is not in the list. Get default index_image
+                option_item = this.options.find(item => item.label === images_list[index_image])
+            }
             map.dragging.disable();
             map.off('drag');
             socket.emit('room-leave', option_item.label);
@@ -421,7 +425,7 @@ socket.on('connect', function () {
         display_polygons();
     })
 });
-index_image = parseInt(window.sessionStorage["index_image"]) || 0;
+
 
 
 document.getElementById("next").addEventListener("click", function (e) {
@@ -500,7 +504,17 @@ $.ajax({
                     success: function (data) {
                         images_list = JSON.parse(data);
                         searchbar.options = images_list.map((x, id) => { return { id: id, label: x }; })
-                        img.src = '/data/images/' + images_list[index_image];
+                        var searchParams = new URLSearchParams(window.location.search.substring(1));
+                        let temp_index = -1;
+                        if (searchParams.has("image")) {
+                            temp_index = searchbar.options.findIndex(item => item.label === searchParams.get("image"))
+                        }
+                        if (temp_index !== -1) {
+                            index_image = temp_index;
+                        } else {
+                            index_image = parseInt(window.sessionStorage["index_image"]) || 0;
+                        }
+                        searchbar.change_image(searchbar.options.find(item => item.label === images_list[index_image]));
                     }
                 })
             })
@@ -511,9 +525,9 @@ $.ajax({
 });
 
 
-// document.getElementById("expand_all").addEventListener("click", function (e) {
-//     $treeview.jstree('open_all');
-// })
+document.getElementById("expand_all").addEventListener("click", function (e) {
+    $treeview.jstree('open_all');
+})
 
 
 // document.getElementById("generate_mask").addEventListener("click", function (e) {

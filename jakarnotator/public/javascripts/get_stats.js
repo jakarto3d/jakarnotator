@@ -4,7 +4,7 @@ var app = new Vue({
     data: {
         items: [],
         fields: [
-            { key: 'name', label: 'Name', sortable: true },
+            { key: 'image_name', label: 'Name', sortable: true },
             { key: 'number_masks', label: 'Number of masks', sortable: true },
         ],
         currentPage: 1,
@@ -26,7 +26,7 @@ var app = new Vue({
                     fetch(`/masks/stats/${image_name}`, { method: 'GET' })
                         .then(response => response.json())
                         .then(data => {
-                                this.addItem({ name: image_name, number_masks: parseInt(data.number_masks), data: data })
+                            this.addItem({ image_name: image_name, number_masks: parseInt(data.number_masks), data: data })
                             })
                 })
             });
@@ -66,7 +66,7 @@ var app = new Vue({
     data: {
         items: [],
         fields: [
-            { key: 'name', label: 'Name', sortable: true },
+            { key: 'category_name', label: 'Name', sortable: true },
             { key: 'number_masks', label: 'Number of masks', sortable: true }
         ],
         currentPage: 1,
@@ -86,7 +86,7 @@ var app = new Vue({
                 Object.keys(data).forEach(key => {
                     category_name = key;
                     number_masks = data[key];
-                    this.addItem({ name: category_name, number_masks: parseInt(number_masks) });
+                    this.addItem({ category_name: category_name, number_masks: parseInt(number_masks) });
                 })
             })
     },
