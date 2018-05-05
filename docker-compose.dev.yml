@@ -23,11 +23,22 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - ./jakarnotator/public/data:/app/public/data
+      - ./jakarnotator/bin:/app/bin
+      - ./jakarnotator/app.js:/app/app.js
+      - ./jakarnotator/my_modules:/app/my_modules
+      - ./jakarnotator/package.json:/app/package.json
+      - ./jakarnotator/routes:/app/routes
+      - ./jakarnotator/package-lock.json:/app/package-lock.json
+      - ./jakarnotator/views:/app/views
+      - ./jakarnotator/gulpfile.js:/app/gulpfile.js
+      - ./jakarnotator/nodemon.json:/app/nodemon.json
+      - ./jakarnotator/public:/app/public
     depends_on:
       - redis
     environment:
       - HOST_REDIS=redis
+    # TODO(tofull) Find a way to run browser-sync module via gulp in docker
+    # command: npm run dev
     command: npm start
 
   redis:
