@@ -411,7 +411,6 @@ socket.on('connect', function () {
     }
     
     socket.on('should_refresh_json', function (data) {
-        console.log(map.editTools.featuresLayer.getLayers())
         map.editTools.featuresLayer.getLayers().forEach(function (l) {
             if (l instanceof L.LayerGroup) {
                 l.getLayers().forEach(function (layer) {
