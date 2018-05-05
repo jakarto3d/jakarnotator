@@ -52,9 +52,11 @@ block content
               p.card-text.px-lg-5
                 | Here you can have a view to analyse your incoming traffic. Jakarnotator collects some metrics thanks to Prometheus and we provide for you a Grafana dashboard.
 
+              p.card-text.text-center.text-muted.small only available if grafana is deployed
             .card-footer
               .d-flex.justify-content-around
-                button.btn.btn-warning Go to your traffic dashboard
+                a(target="_blank", href="http://localhost:3000")
+                  button.btn.btn-success Go to your traffic dashboard
               .text-muted.text-center.mt-1
                 | (username:
                 span.text-dark  admin
@@ -70,5 +72,3 @@ block content
             .card-footer.d-flex.justify-content-around
               a(target="_blank", href="https://twitter.com/intent/tweet?text=Thanks%20Jakarto%20for%20this%20open%20source%20image%20annotation%20tool%20%21&related=Jakarto3D%3A_Tofull&via=Jakarto3D&hashtags=Jakarnotator")
                 button.btn.btn-info Say a big thanks to Jakarto.
-          
-          
