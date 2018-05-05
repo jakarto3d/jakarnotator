@@ -106,7 +106,7 @@
       }
     },
     {
-      "content": "<center><img src=\"https://www.jakarto.com/hubfs/jakarto/img/mockup3.png\" alt=\"logo jakarto\" height=\"300px\"/></center>\n",
+      "content": "<center><img src=\"http://github.com/jakarto3d/media/raw/master/logo_jakarto_fond_lidar.png\" alt=\"logo jakarto\" height=\"300px\"/></center>\n",
       "gridPos": {
         "h": 9,
         "w": 12,
@@ -273,6 +273,7 @@
           "expr": "sum(up)",
           "format": "time_series",
           "hide": false,
+          "instant": false,
           "intervalFactor": 1,
           "legendFormat": "",
           "refId": "A"
@@ -290,7 +291,7 @@
           "value": "null"
         }
       ],
-      "valueName": "avg"
+      "valueName": "current"
     },
     {
       "columns": [],
@@ -387,6 +388,6 @@
   },
   "timezone": "",
   "title": "jakarnotator_dashboard",
-  "uid": "rHeAsGMik",
+  "uid": "default-dashboard",
   "version": 1
 }
