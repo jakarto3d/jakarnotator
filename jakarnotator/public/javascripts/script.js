@@ -121,7 +121,7 @@ function save_polygon(e) {
     
         window.sessionStorage.setItem("dataset", JSON.stringify(dataset));
     
-        var url_mask = `/masks/${images_list[index_image]}`
+        var url_mask = `/api/v1/masks/${images_list[index_image]}`
         $.ajax({
             url: url_mask,
             type: 'POST',
@@ -287,7 +287,7 @@ map.on('layeradd', function (e) {
 });
 
 var display_polygons = function(){
-    var url_mask = `/masks/${images_list[index_image]}`
+    var url_mask = `/api/v1/masks/${images_list[index_image]}`
     $.ajax({
         url: url_mask,
         type: 'GET',
@@ -458,7 +458,7 @@ document.getElementById("help_btn").addEventListener("click", function (e) {
 var annotation_list;
 var $treeview = $('#tree')
 $.ajax({
-    url: "/list_annotations",
+    url: "/api/v1/categories",
     type: 'GET',
     success: function (data) {
         if (typeof data !== Array){
@@ -505,7 +505,7 @@ $.ajax({
                     }
                 });
                 $.ajax({
-                    url: "/images",
+                    url: "/api/v1/images",
                     type: 'GET',
                     success: function (data) {
                         images_list = JSON.parse(data);
@@ -545,27 +545,27 @@ document.getElementById("expand_all").addEventListener("click", function (e) {
 //     // TODO(tofull) This processing should be on server-side... and doesn't need routes
 //     images_list.forEach(function(image){
 //         $.ajax({
-//             url: `/process/spliter/${image}`,
+//             url: `/api/v1/process/spliter/${image}`,
 //             complete: function(){
 //                 c0++;
 //                 if (c0 == images_list.length){
 //                     console.log("spliter done");
 //                     images_list.forEach(function (image) {
 //                         $.ajax({
-//                             url: `/process/maskconverter/tif/${image}`,
+//                             url: `/api/v1/process/maskconverter/tif/${image}`,
 //                             complete: function(){
 //                                 c1++;
 //                                 if (c1 == images_list.length){
 //                                     console.log("maskconverter tif done");
 //                                     images_list.forEach(function (image) {
 //                                         $.ajax({
-//                                             url: `/process/maskconverter/png/${image}`,
+//                                             url: `/api/v1/process/maskconverter/png/${image}`,
 //                                             complete: function () {
 //                                                 c2++;
 //                                                 if (c2 == images_list.length) {
 //                                                     console.log("maskconverter png done");
 //                                                     $.ajax({
-//                                                         url: `/process/generate_coco_format`,
+//                                                         url: `/api/v1/process/generate_coco_format`,
 //                                                         success: function (data) {
 //                                                             console.log(data);
 //                                                             console.log("json coco format generated");

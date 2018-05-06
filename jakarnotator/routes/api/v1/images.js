@@ -19,7 +19,6 @@ const get_list_images = (req, res) => {
     // Set the string-key:list_images in our cache.
     // Set cache expiration to 1 hour (60 minutes)
     client.setex("list_images", 3600, JSON.stringify(files));
-    
     res.json(JSON.stringify(files));
   })
 }

@@ -18,12 +18,12 @@ var app = new Vue({
     },
     created: function(){
         totalRows = this.items.length;
-        fetch('/images', { method: 'GET' })
+        fetch('/api/v1/images', { method: 'GET' })
             .then(response => response.json())
             .then(list_image_json => JSON.parse(list_image_json))
             .then(list_images => {
                 list_images.map((image_name, index) => {
-                    fetch(`/masks/stats/${image_name}`, { method: 'GET' })
+                    fetch(`/api/v1/masks/stats/${image_name}`, { method: 'GET' })
                         .then(response => response.json())
                         .then(data => {
                             this.addItem({ image_name: image_name, number_masks: parseInt(data.number_masks), data: data })
@@ -80,7 +80,7 @@ var app = new Vue({
     },
     created: function(){
         totalRows = this.items.length;
-        fetch(`/process/test`, { method: 'GET' })
+        fetch(`/api/v1/process/test`, { method: 'GET' })
             .then(response => response.json())
             .then(data => {
                 Object.keys(data).forEach(key => {

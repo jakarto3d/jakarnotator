@@ -174,7 +174,7 @@ router.get("/maskconverter/png/:image_name", (req, res) => {
 
 
 router.get("/generate_coco_format", (req, res) => {
-
+  // TODO(tofull) move python script from data folder
   var cococreator_command = `cd public/data/ && python shapes_to_coco.py`
   var cococreator = spawn(cococreator_command, [], { shell: true });
   cococreator.stdout.on('data', (data) => {
@@ -198,9 +198,10 @@ router.get('/download', function (req, res, next) {
   var imageFolder = 'public/data/images'
   fs.readdir(imageFolder, (err, files) => {
     files.forEach(function (file) {
-      export_files.push({path: path.join(__dirname, `../public/data/images/${file}`), name: `images/${file}` })
+      // TODO(tofull) remove the hardcoded location of files
+      export_files.push({path: path.join(__dirname, `../../../public/data/images/${file}`), name: `images/${file}` })
     })
-    export_files.push({ path: path.join(__dirname, '../public/data/instances_shape_jakartotrain2018.json'), name: 'instances_shape_jakartotrain2018.json' })
+    export_files.push({ path: path.join(__dirname, '../../../public/data/instances_shape_jakartotrain2018.json'), name: 'instances_shape_jakartotrain2018.json' })
 
     res.zip({
       files: export_files,
