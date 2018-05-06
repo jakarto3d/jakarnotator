@@ -6,15 +6,23 @@ var path = require("path");
 var sharp = require("sharp");
 var glob = require("glob");
 var zip = require('express-easy-zip');
+var fs = require("fs");
 const { spawn } = require('child_process');
 
 router.use(bodyParser.json());  // parse application/json
 router.use(bodyParser.urlencoded({ extended: true }));  // parse application/x-www-form-urlencoded
 router.use(zip());
 
-var fs = require("fs");
-var category_counter = {};
 
+// TODO(tofull) jobs should be stacked in working queue (see async.js -> cargo module)
+// TODO(tofull) There is no need to use gdal rasterize, gdal translate, and pycocotools + pycococreator because we already have the polygon thanks to the mask
+
+var category_counter = {};
+var executable_extension = ""
+var isWin = process.platform === "win32";
+if (isWin){
+  executable_extension = ".exe"
+}
 
 function reset_category_counter(image_basename) {
   if (image_basename) {
@@ -23,6 +31,7 @@ function reset_category_counter(image_basename) {
     category_counter = {};
   }
 }
+
 
 function update_category_counter(image_basename, category) {
   if (category_counter[image_basename] === undefined) {
@@ -37,15 +46,12 @@ function update_category_counter(image_basename, category) {
   return category_counter[image_basename][category]
 }
 
-/* GET users listing. */
-router.get("/", function (req, res, next) {
-  res.send("respond with a resource");
-});
 
 router.get("/reset", function (req, res, next) {
   reset_category_counter();
-  res.send("respond with a resource");
+  res.send("Reset each categorie count for all images");
 });
+
 
 router.get("/reset/:image_name", function (req, res) {
   var image_name = req.params.image_name;
@@ -53,8 +59,9 @@ router.get("/reset/:image_name", function (req, res) {
   var image_basename = image_name.replace(/\.[^/.]+$/, "");
 
   reset_category_counter(image_basename);
-  res.send("respond with a resource");
+  res.send(`Reset each categorie count for image ${image_basename}`);
 });
+
 
 router.get("/spliter/:image_name", (req, res) => {
   var image_name = req.params.image_name;
@@ -93,6 +100,7 @@ router.get("/spliter/:image_name", (req, res) => {
 
 
 router.get("/maskconverter/tif/:image_name", (req, res) => {
+  // console.log("Wanna convert geojson to tif")
   var image_name = req.params.image_name;
   var image_basename = image_name.replace(/\.[^/.]+$/, "");
   var image_path = `public/data/images/${image_name}`;
@@ -119,10 +127,13 @@ router.get("/maskconverter/tif/:image_name", (req, res) => {
         // console.log(file_basename);
         var output_file = `public/data/process/masks/tif/${file_basename}.tif`
         // call gdal
-        var gdal_command = `gdal_rasterize.exe -burn 255 -burn 255 -burn 255 -ts ${w} ${h} -te 0 0 ${w} ${h} "${file}" "${output_file}"`
+        var gdal_command = `gdal_rasterize${executable_extension} -burn 255 -burn 255 -burn 255 -ts ${w} ${h} -te 0 0 ${w} ${h} "${file}" "${output_file}"`
         // console.log(gdal_command)
         var gdal = spawn(gdal_command, [], { shell: true });
 
+        // gdal.stderr.on('data', (data) => {
+        //   console.log(`gdal stderr: ${data}`);
+        // });
         gdal.on('close', function (code) {
           c++;
           // console.log(`child process exited with code ${code}`);
@@ -154,16 +165,27 @@ router.get("/maskconverter/png/:image_name", (req, res) => {
       var file_basename = file.replace(/.*\//, "")  // Remove all the thing before the last slash (server url & api)
         .replace(/\.[^/.]+$/, "")  // Remove all the thing after the last . (extension)
 
-      var output_file = `public/data/process/masks/png/${file_basename}.png`
+      var output_file_correct = `public/data/process/masks/png/${file_basename}.png`
+      var output_file = `public/data/process/masks/png/${file_basename}_toflip.png`
       // call gdal
-      var gdal_command = `gdal_translate.exe -of PNG  "${file}" "${output_file}"`
+      var gdal_command = `gdal_translate${executable_extension} -of PNG  "${file}" "${output_file}"`
       var gdal = spawn(gdal_command, [], { shell: true });
       gdal.on('close', function (code) {
-        sharp(output_file).flip().toFile(output_file, function (err) {
-          c++;
-          if (c == files.length) {
-            return res.send("respond with a resource");
-          }
+        // c++;
+        // if (c == files.length) {
+        //   return res.send("respond with a resource");
+        // }
+        sharp(output_file).flip().toFile(output_file_correct, function (err) {
+          console.log(err)
+          fs.unlink(output_file, function (error) {
+            if (error) {
+              throw error;
+            }
+            c++;
+            if (c == files.length) {
+              return res.send("respond with a resource");
+            }
+          });
 
         });
       })
@@ -175,7 +197,7 @@ router.get("/maskconverter/png/:image_name", (req, res) => {
 
 router.get("/generate_coco_format", (req, res) => {
   // TODO(tofull) move python script from data folder
-  var cococreator_command = `cd public/data/ && python shapes_to_coco.py`
+  var cococreator_command = `cd public/data/ && python3 shapes_to_coco.py`
   var cococreator = spawn(cococreator_command, [], { shell: true });
   cococreator.stdout.on('data', (data) => {
     console.log(`cococreator stdout: ${data}`);

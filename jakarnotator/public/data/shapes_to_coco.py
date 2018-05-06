@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# -*- coding=utf-8 -*-
+
 
 import datetime
 import json
@@ -29,7 +31,7 @@ INFO = {
 LICENSES = [
     {
         "id": 1,
-        "name": "Licence Creative Commons Attribution - Pas d’Utilisation Commerciale - Partage dans les Mêmes Conditions 4.0 International",
+        "name": "Licence Creative Commons Attribution - Pas d'Utilisation Commerciale - Partage dans les Mêmes Conditions 4.0 International",
         "url": "http://creativecommons.org/licenses/by-nc-sa/4.0/"
     }
 ]
