@@ -1,4 +1,5 @@
 Need redis server on.
+Grafana and Prometheus are also required.
 
 ```
 cd jakarnotator
@@ -19,12 +20,9 @@ $env:PORT='80';$env:DEBUG='jakarnotator:*'; npm start
 
 # with docker
 ```
-docker build -t jakarnotator .
-docker run -it --rm -p 8082:8080 -v ${PWD}/jakarnotator/public/data:/app/public/data jakarnotator
+# Development
+docker-compose -f docker-compose.dev.yml up --build --force-recreate
 
-# Prometheus
-# http://localhost:9090
-
-# Graphana (user: admin, password: admin)
-# http://localhost:3000/d/rHeAsGMik/jakarnotator_dashboard?orgId=1
+# Production
+docker-compose -f docker-compose.yml up --build --force-recreate
 ```
