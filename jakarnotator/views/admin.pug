@@ -6,11 +6,12 @@ block head
   meta(http-equiv='X-UA-Compatible', content='ie=edge')
   title Administration page
 
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.0/socket.io.js')
   link(rel='stylesheet', href='/stylesheets/style.css')
 
 
 block content
-  .container-fluid.mt-4
+  .container-fluid.mt-4#app
     .row
       .col-12.col-lg-6.offset-lg-3
         p.text-center Legend:
@@ -35,9 +36,15 @@ block content
               h5.card-title COCO-format masks generator
               p.card-text.px-lg-5
                 | Export the masks in COCO-format to train your machine learning algorithms.
+              p.card-text.px-lg-5.text-muted
+                | Status : 
+                span {{ msg }}
             .card-footer.text-center
                 .my-1
-                  button.btn.btn-success.my-2.my-xl-0#generate_mask Generate masks
+                  button.btn.btn-success.my-2.my-xl-0#generate_mask(:disabled="available == false") 
+                    | Generate masks
+                    //- TODO(tofull) Remove this text-danger once fix process (async.cargo at least)
+                    span.text-danger  (limited)
                 .my-1
                   //- TODO(tofull) Change this hardcoded link to a call api.
                   a(target="_blank", href="/data/instances_shape_jakartotrain2018.json")

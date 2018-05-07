@@ -64,6 +64,7 @@ router.get("/reset/:image_name", function (req, res) {
 
 
 router.get("/spliter/:image_name", (req, res) => {
+  req.app.app_data.processing_masks_status = { available: false, message: "server splitting polygons (step 1/4)" };  // Avoid multiple calls during processing coco format generator
   var image_name = req.params.image_name;
   var mask = `public/data/masks/${image_name}.json`;
   var image_basename = image_name.replace(/\.[^/.]+$/, "");
@@ -100,6 +101,7 @@ router.get("/spliter/:image_name", (req, res) => {
 
 
 router.get("/maskconverter/tif/:image_name", (req, res) => {
+  req.app.app_data.processing_masks_status = { available: false, message: "server generating tif (step 2/4)" };  // Avoid multiple calls during processing coco format generator
   // console.log("Wanna convert geojson to tif")
   var image_name = req.params.image_name;
   var image_basename = image_name.replace(/\.[^/.]+$/, "");
@@ -150,6 +152,7 @@ router.get("/maskconverter/tif/:image_name", (req, res) => {
 
 
 router.get("/maskconverter/png/:image_name", (req, res) => {
+  req.app.app_data.processing_masks_status = { available: false, message: "server generating png (step 3/4)" };  // Avoid multiple calls during processing coco format generator
   var image_name = req.params.image_name;
   var image_basename = image_name.replace(/\.[^/.]+$/, "");
   var image_path = `public/data/images/${image_name}`;
@@ -196,6 +199,7 @@ router.get("/maskconverter/png/:image_name", (req, res) => {
 
 
 router.get("/generate_coco_format", (req, res) => {
+  req.app.app_data.processing_masks_status = { available: false, message: "server generating masks (step 4/4)" };  // Avoid multiple calls during processing coco format generator
   // TODO(tofull) move python script from data folder
   var cococreator_command = `cd public/data/ && python3 shapes_to_coco.py`
   var cococreator = spawn(cococreator_command, [], { shell: true });
@@ -206,6 +210,8 @@ router.get("/generate_coco_format", (req, res) => {
     console.log(`cococreator stderr: ${data}`);
   });
   cococreator.on('close', function (code) {
+    req.app.app_data.processing_masks_status = { available: true, message: "server ready" };  // Avoid multiple calls during processing coco format generator
+
     res.send("json coco format generated");
   });
 });
@@ -268,5 +274,6 @@ router.get("/test", function(req, res, next){
     })
   })
 })
+
 
 module.exports = router;

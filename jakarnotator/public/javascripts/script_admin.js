@@ -1,3 +1,22 @@
+var socket = io();
+
+var vue = new Vue({
+    el: '#app',
+    data: {
+        msg: 'Waiting information from server',
+        available: false
+    }
+})
+
+socket.on('connect', function () {
+    socket.emit('admin_panel_enter');
+    socket.on('processing_masks_status', function (data) {
+        console.log("received processing masks status from server");
+        console.log(data);
+        vue.msg = data.message;
+        vue.available = data.available;
+    })
+});
 
 document.getElementById("generate_mask").addEventListener("click", function (e) {
     // TODO(tofull) This process should be serverside
@@ -6,7 +25,7 @@ document.getElementById("generate_mask").addEventListener("click", function (e) 
     fetch(`/api/v1/images`, { method: 'GET' })
         .then(response => response.json())
         .then(data => JSON.parse(data))
-        // .then(images_list => images_list.slice(-3,-1))
+        .then(images_list => images_list.slice(-3,-1))  // TODO(tofull) Remove this when at least image processing will use async.cargo feature (risk of full memory usage otherwise (each process will be spawn at the same time) -> docker will kill your container)
         .then(images_list => images_list)
         .then(images_list => {
             console.log(`received ${images_list.length} images from the server`);

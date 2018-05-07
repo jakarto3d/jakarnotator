@@ -5,9 +5,18 @@ var cookieParser = require("cookie-parser");
 var logger = require("morgan");
 const promBundle = require("express-prom-bundle");
 
+// hack to require local module without ../../../..
+global.app_require = function (name) {
+  return require(__dirname + '/node_modules_project/' + name);
+}
+
 var indexRouter = require("./routes/index");
 
 var app = express();
+
+// app_data to share state of the server with client (used in process.js route and websocket)
+app.app_data = {}
+app.app_data.processing_masks_status = {available: true, message: "server just started"};
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));

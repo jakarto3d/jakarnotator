@@ -7,7 +7,7 @@
 var app = require('../app');
 var debug = require('debug')('jakarnotator:server');
 var http = require('http');
-var custom_sockets = require('../my_modules/custom_sockets');
+var custom_sockets = app_require("custom_sockets");
 
 /**
  * Get port from environment and store in Express.
@@ -26,7 +26,7 @@ var server = http.createServer(app);
  * custom_sockets (based on socket.io)
  */
 
-custom_sockets(server);
+server = custom_sockets(server);
 
 /**
  * Listen on provided port, on all network interfaces.
