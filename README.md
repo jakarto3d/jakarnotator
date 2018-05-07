@@ -21,8 +21,8 @@ $env:PORT='80';$env:DEBUG='jakarnotator:*'; npm start
 # with docker
 ```
 # Development
-docker-compose -f docker-compose.dev.yml up --build --force-recreate
+docker-compose -p dev -f docker-compose.dev.yml up --build --force-recreate
 
 # Production
-docker-compose -f docker-compose.yml up --build --force-recreate
+JAKARNOTATOR_PORT_MAPPED=80 docker-compose -p prod -f docker-compose.yml up --build --force-recreate
 ```
