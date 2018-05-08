@@ -82,7 +82,7 @@
         },
         created: function() {
             totalRows = this.items.length;
-            fetch(`/api/v1/process/test`, {method: 'GET'})
+            fetch(`/api/v1/process/masks_by_categories`, {method: 'GET'})
             .then((response) => response.json())
             .then((data) => {
                 Object.keys(data).forEach((key) => {

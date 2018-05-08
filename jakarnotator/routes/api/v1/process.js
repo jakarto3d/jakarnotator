@@ -240,7 +240,7 @@ router.get('/download', function(req, res, next) {
 });
 
 
-router.get('/test', function(req, res, next) {
+router.get('/masks_by_categories', function(req, res, next) {
   let output = {};
   let allFilesProcessed = 0;
   glob(`public/data/masks/*.json`, function(er, files) {
@@ -265,7 +265,7 @@ router.get('/test', function(req, res, next) {
             }
           });
         } else {
-            allFilesProcessed++;
+          allFilesProcessed++;
           if (allFilesProcessed == files.length) {
             res.send(JSON.stringify(output));
           }
