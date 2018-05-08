@@ -83,7 +83,6 @@ router.get('/spliter/:image_name', (req, res) => {
 
   resetCategoryCounter(imageBasename);
   fs.readFile(mask, 'utf8', function(err, data) {
-    // if (err) throw err;
     if (err) {
       return res.status(404).send('no data');
     };
@@ -97,7 +96,6 @@ router.get('/spliter/:image_name', (req, res) => {
         fs.writeFile(path, JSON.stringify(item), function(err) {
           c++;
           if (err) throw err;
-          // console.log(`${filename} created`);
           if (c == dataArray.length) {
             return res.send('respond with a resource');
           }
@@ -113,36 +111,30 @@ router.get('/spliter/:image_name', (req, res) => {
 router.get('/maskconverter/tif/:image_name', (req, res) => {
   req.app.app_data.processing_masks_status = {
     available: false, message: 'server generating tif (step 2/4)'}; // Avoid multiple calls during processing coco format generator
-  // console.log('Wanna convert geojson to tif')
   let imageName = req.params.image_name;
   let imageBasename = imageName.replace(/\.[^/.]+$/, '');
   let imagePath = `public/data/images/${imageName}`;
 
   glob(`public/data/process/masks/geojson/${imageBasename}*.geojson`, function(er, files) {
-    // console.log(er)
-    // console.log(files)
     if (files.length == 0) {
       return res.status(404).send('Corresponding data not found');
     }
     let c = 0;
     // get size of the image
+    // TODO(tofull) if sharp could do this, doesn't use Jimp and sharp
     new Jimp(imagePath, function(err, image) {
       let w = image.bitmap.width; // the width of the image
       let h = image.bitmap.height; // the height of the image
-      // console.log(w, h);
 
       // get all masks geojson to transform
       files.forEach(function(file) {
-        // console.log(file);
         let fileBasename = file.replace(/.*\//, '') // Remove all the thing before the last slash (server url & api)
           .replace(/\.[^/.]+$/, ''); // Remove all the thing after the last . (extension)
 
-        // console.log(file_basename);
         let outputFile = `public/data/process/masks/tif/${fileBasename}.tif`;
         // call gdal
         // eslint-disable-next-line max-len
         let gdalCommand = `gdal_rasterize${executableExtension} -burn 255 -burn 255 -burn 255 -ts ${w} ${h} -te 0 0 ${w} ${h} "${file}" "${outputFile}"`;
-        // console.log(gdal_command)
         let gdal = spawn(gdalCommand, [], {shell: true});
 
         // gdal.stderr.on('data', (data) => {
@@ -150,7 +142,6 @@ router.get('/maskconverter/tif/:image_name', (req, res) => {
         // });
         gdal.on('close', function(code) {
           c++;
-          // console.log(`child process exited with code ${code}`);
           if (c == files.length) {
             return res.send('respond with a resource');
           }
@@ -185,12 +176,7 @@ router.get('/maskconverter/png/:image_name', (req, res) => {
       let gdalCommand = `gdal_translate${executableExtension} -of PNG  "${file}" "${outputFileTemp}"`;
       let gdal = spawn(gdalCommand, [], {shell: true});
       gdal.on('close', function(code) {
-        // c++;
-        // if (c == files.length) {
-        //   return res.send('respond with a resource');
-        // }
         sharp(outputFileTemp).flip().toFile(outputFileCorrect, function(err) {
-          console.log(err);
           fs.unlink(outputFileTemp, function(error) {
             if (error) {
               throw error;

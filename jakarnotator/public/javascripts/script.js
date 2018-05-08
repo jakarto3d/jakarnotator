@@ -114,7 +114,6 @@
                     // Check if first coordinate is different from undefined. I dont know why, but Leaflet.Editable deleteShapeAt function doesn't delete enterely the polygon...
                     if (data.geometry.coordinates[0][0] !== undefined) {
                         if (data.geometry.coordinates[0] !== undefined) {
-                            // TODO(tofull) do for ... of here
                             for (let indexPoint in data.geometry.coordinates[0]) {
                                 if ({}.hasOwnProperty.call(data.geometry.coordinates[0], indexPoint)) {
                                     let [x, y] = data.geometry.coordinates[0][indexPoint];
