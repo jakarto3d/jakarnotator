@@ -1,0 +1,167 @@
+[
+    {
+        "supercategory": "shape",
+        "id": 1,
+        "name": "human"
+    },
+    {
+        "supercategory": "human",
+        "id": 2,
+        "name": "person"
+    },
+    {
+        "supercategory": "shape",
+        "id": 3,
+        "name": "vehicle"
+    },
+    {
+        "supercategory": "vehicle",
+        "id": 4,
+        "name": "bicycle"
+    },
+    {
+        "supercategory": "vehicle",
+        "id": 5,
+        "name": "car"
+    },
+    {
+        "supercategory": "vehicle",
+        "id": 6,
+        "name": "motorcycle"
+    },
+    {
+        "supercategory": "vehicle",
+        "id": 7,
+        "name": "airplane"
+    },
+    {
+        "supercategory": "vehicle",
+        "id": 8,
+        "name": "bus"
+    },
+    {
+        "supercategory": "vehicle",
+        "id": 9,
+        "name": "train"
+    },
+    {
+        "supercategory": "vehicle",
+        "id": 10,
+        "name": "truck"
+    },
+    {
+        "supercategory": "vehicle",
+        "id": 11,
+        "name": "boat"
+    },
+    {
+        "supercategory": "shape",
+        "id": 12,
+        "name": "outdoor"
+    },
+    {
+        "supercategory": "outdoor",
+        "id": 13,
+        "name": "traffic light"
+    },
+    {
+        "supercategory": "outdoor",
+        "id": 14,
+        "name": "fire hydrant"
+    },
+    {
+        "supercategory": "outdoor",
+        "id": 15,
+        "name": "stop sign"
+    },
+    {
+        "supercategory": "outdoor",
+        "id": 16,
+        "name": "parking meter"
+    },
+    {
+        "supercategory": "outdoor",
+        "id": 17,
+        "name": "bench"
+    },
+    {
+        "supercategory": "shape",
+        "id": 18,
+        "name": "vegetation"
+    },
+    {
+        "supercategory": "vegetation",
+        "id": 19,
+        "name": "tree"
+    },
+    {
+        "supercategory": "vegetation",
+        "id": 20,
+        "name": "plant"
+    },
+    {
+        "supercategory": "shape",
+        "id": 21,
+        "name": "building"
+    },
+    {
+        "supercategory": "building",
+        "id": 22,
+        "name": "face"
+    },
+    {
+        "supercategory": "building",
+        "id": 23,
+        "name": "window"
+    },
+    {
+        "supercategory": "building",
+        "id": 24,
+        "name": "door"
+    },
+    {
+        "supercategory": "shape",
+        "id": 25,
+        "name": "utility"
+    },
+    {
+        "supercategory": "utility",
+        "id": 26,
+        "name": "bus-stop"
+    },
+    {
+        "supercategory": "utility",
+        "id": 27,
+        "name": "letter-box"
+    },
+    {
+        "supercategory": "shape",
+        "id": 28,
+        "name": "civil"
+    },
+    {
+        "supercategory": "civil",
+        "id": 29,
+        "name": "manhole"
+    },
+    {
+        "supercategory": "civil",
+        "id": 30,
+        "name": "pavement"
+    },
+    {
+        "supercategory": "civil",
+        "id": 31,
+        "name": "street ligths"
+    },
+    {
+        "supercategory": "civil",
+        "id": 32,
+        "name": "pedestrian crossing"
+    },
+    {
+        "id": 33,
+        "name": "default",
+        "supercategory": "shape"
+    }
+]
