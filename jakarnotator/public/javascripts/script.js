@@ -1,6 +1,6 @@
 (function() {
-    // window.localStorage.clear();
-    // window.sessionStorage.clear();
+    window.localStorage.clear();
+    window.sessionStorage.clear();
 
     let indexImage;
     let width;
@@ -70,29 +70,63 @@
             link.title = 'Create a new polygon';
             link.innerHTML = '▱';
             L.DomEvent.on(link, 'click', L.DomEvent.stop)
-            .on(link, 'click', function() {
-                map.editTools.startPolygon();
+                .on(link, 'click', function() {
+                    map.editTools.startPolygon();
                 });
-                return container;
+            container.style.display = 'block';
+            // map.editTools.on('editable:enabled', function(e) {
+            //     container.style.display = 'none';
+            // });
+            // map.editTools.on('editable:disable', function(e) {
+            //     container.style.display = 'block';
+            // });
+            return container;
             },
-        });
+    });
+    L.AddPolygonShapeControl = L.Control.extend({
+        options: {
+            position: 'topleft',
+        },
+        onAdd: function(map) {
+            let container = L.DomUtil.create('div', 'leaflet-control leaflet-bar');
+            let link = L.DomUtil.create('a', '', container);
+            link.href = '#';
+            link.title = 'Create a new polygon';
+            link.innerHTML = '▱▱';
+            L.DomEvent.on(link, 'click', L.DomEvent.stop)
+                .on(link, 'click', function() {
+                    console.log('clicked');
+                    if (!editingLayer) return;
+                    editingLayer.editor.newShape();
+                });
+            container.style.display = 'none';
+            // container.style.display = 'block';
+            map.editTools.on('editable:enabled', function(e) {
+                container.style.display = 'block';
+            });
+            map.editTools.on('editable:disable', function(e) {
+                container.style.display = 'none';
+            });
+            return container;
+        },
+    });
 
-        map.addControl(new L.NewPolygonControl());
-
-        let Z = 90;
-        let latlng;
-        let redoBuffer = [];
-        onKeyDown = function(e) {
-            if (e.keyCode == Z) {
-                if (!this.editTools._drawingEditor) return;
-                if (e.shiftKey) {
-                    if (redoBuffer.length) this.editTools._drawingEditor.push(redoBuffer.pop());
-                } else {
-                    latlng = this.editTools._drawingEditor.pop();
-                    if (latlng) redoBuffer.push(latlng);
-                }
+    map.addControl(new L.NewPolygonControl());
+    map.addControl(new L.AddPolygonShapeControl());
+    let Z = 90;
+    let latlng;
+    let redoBuffer = [];
+    onKeyDown = function(e) {
+        if (e.keyCode == Z) {
+            if (!this.editTools._drawingEditor) return;
+            if (e.shiftKey) {
+                if (redoBuffer.length) this.editTools._drawingEditor.push(redoBuffer.pop());
+            } else {
+                latlng = this.editTools._drawingEditor.pop();
+                if (latlng) redoBuffer.push(latlng);
             }
-        };
+        }
+    };
 
 
         L.DomEvent.addListener(document, 'keydown', onKeyDown, map);
@@ -109,17 +143,30 @@
                     data = layer.toGeoJSON();
                     if (data.type === 'FeatureCollection') {
                         // I dont know why, but Leaflet.Editable considers a polygon as a FeatureCollection of polygon the second time I draw a polygon. So extract the first (and unique) feature instead !
+                        if (data.features[0].geometry.type === 'MultiPolygon') {
+                            let temp = [];
+                            temp = [...data.features[0].geometry.coordinates[0], ...data.features[0].geometry.coordinates.slice(1).map((item) => item[0])];
+                            data.features[0].geometry.coordinates = temp;
+                            data.features[0].geometry.type = 'Polygon';
+                        }
                         data = data.features[0];
                     }
+
+
                     // Check if first coordinate is different from undefined. I dont know why, but Leaflet.Editable deleteShapeAt function doesn't delete enterely the polygon...
                     if (data.geometry.coordinates[0][0] !== undefined) {
                         if (data.geometry.coordinates[0] !== undefined) {
-                            for (let indexPoint in data.geometry.coordinates[0]) {
-                                if ({}.hasOwnProperty.call(data.geometry.coordinates[0], indexPoint)) {
-                                    let [x, y] = data.geometry.coordinates[0][indexPoint];
-                                    let xInImage = Math.round(x / scaling);
-                                    let yInImage = Math.round(y / scaling);
-                                    data.geometry.coordinates[0][indexPoint] = [xInImage, height - yInImage];
+                            for (let indexGeometry in data.geometry.coordinates) {
+                                if ({}.hasOwnProperty.call(data.geometry.coordinates, indexGeometry)) {
+                                    for (let indexPoint in data.geometry.coordinates[indexGeometry]) {
+                                        if ({}.hasOwnProperty.call(data.geometry.coordinates[indexGeometry], indexPoint)) {
+                                            // console.log(JSON.parse(JSON.stringify(data.geometry.coordinates[indexGeometry][indexPoint])));
+                                            let [x, y] = data.geometry.coordinates[indexGeometry][indexPoint];
+                                            let xInImage = Math.round(x / scaling);
+                                            let yInImage = Math.round(y / scaling);
+                                            data.geometry.coordinates[indexGeometry][indexPoint] = [xInImage, height - yInImage];
+                                        }
+                                    }
                                 }
                             }
                             dataset[img.src].push(data);
@@ -200,6 +247,15 @@
                     }
                 }
             });
+        }
+
+        // & ou 1 ! (clavier canadien)
+        if (event.keyCode === 49) {
+            // If not editing do nothing
+            // otherwise, add new shape to editingLayer
+            if (!editingLayer) return;
+            map.editTools.stopDrawing();
+            editingLayer.editor.newShape();
         }
 
         // ² ou | # ~ (clavier canadien)
@@ -290,6 +346,7 @@
                         }
                     }
                     editingLayer = e.layer;
+                    map.editTools.fire('editable:enabled');
                 } else {
                     editingLayer = undefined;
                 }
@@ -320,12 +377,17 @@
                 for (let indexGeojsonFeature in dataset[img.src]) {
                     if ({}.hasOwnProperty.call(dataset[img.src], indexGeojsonFeature)) {
                         geojsonFeature = dataset[img.src][indexGeojsonFeature];
-                        for (let indexPoint in geojsonFeature.geometry.coordinates[0]) {
-                            if ({}.hasOwnProperty.call(geojsonFeature.geometry.coordinates[0], indexPoint)) {
-                                let [x, y] = geojsonFeature.geometry.coordinates[0][indexPoint];
-                                let xInGeo = x * scaling;
-                                let yInGeo = (height - y) * scaling;
-                                geojsonFeature.geometry.coordinates[0][indexPoint] = [xInGeo, yInGeo];
+
+                        for (let indexGeometry in geojsonFeature.geometry.coordinates) {
+                            if ({}.hasOwnProperty.call(geojsonFeature.geometry.coordinates, indexGeometry)) {
+                                for (let indexPoint in geojsonFeature.geometry.coordinates[indexGeometry]) {
+                                    if ({}.hasOwnProperty.call(geojsonFeature.geometry.coordinates[indexGeometry], indexPoint)) {
+                                        let [x, y] = geojsonFeature.geometry.coordinates[indexGeometry][indexPoint];
+                                        let xInGeo = x * scaling;
+                                        let yInGeo = (height - y) * scaling;
+                                        geojsonFeature.geometry.coordinates[indexGeometry][indexPoint] = [xInGeo, yInGeo];
+                                    }
+                                }
                             }
                         }
 

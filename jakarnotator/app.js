@@ -11,7 +11,6 @@ global.app_require = function(name) {
 };
 
 let indexRouter = require('./routes/index');
-console.log(indexRouter);
 let app = express();
 
 // app_data to share state of the server with client (used in process.js route and websocket)

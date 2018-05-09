@@ -2,9 +2,9 @@
   .modal-dialog
     .modal-content
       .modal-header
+        h4#myModalLabel.modal-title Keyboard Shortcut
         button.close(type='button', data-dismiss='modal', aria-label='Close')
           span(aria-hidden='true') ×
-        h4#myModalLabel.modal-title Keyboard Shortcut
       .modal-body
         table
           tr
@@ -14,7 +14,7 @@
           tr
             td(width='80')
               pan.label.label-default ?
-            td(width='200') Help
+            td(width='300') Help
           tr
             td
               p
@@ -23,10 +23,10 @@
           tr
             td(width='60')
               span.label.label-default F1
-            td(width='200') Next image
+            td(width='300') Next image
             td(width='60')
               span.label.label-default F2
-            td(width='200') Previous image
+            td(width='300') Previous image
           tr
             td
               span.label.label-default dbl click on polygon
@@ -44,16 +44,19 @@
               span.label.label-default ESC
             td Save current polygon and stop edition mode
           tr
-            td
+            td(width='60')
                 span.label.label-default ²
             td Save current polygon and start a new one
+            td(width='60')
+              span.label.label-default &
+            td(width='300') Save current polygon and start a new shape (two polygons for one object, or one polygon with holes for instance)
           tr
             td(width='60')
               span.label.label-default F1
-            td(width='200') Save polygon and go to next image
+            td(width='300') Save polygon and go to next image
             td(width='60')
               span.label.label-default F2
-            td(width='200') Save polygon and go to previous image
+            td(width='300') Save polygon and go to previous image
           tr
             td
               span.label.label-default ctrl + click

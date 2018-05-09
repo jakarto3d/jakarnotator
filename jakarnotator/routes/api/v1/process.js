@@ -1,28 +1,30 @@
 let express = require('express');
 let router = new express.Router();
 let bodyParser = require('body-parser');
-let Jimp = require('jimp');
 let path = require('path');
 let sharp = require('sharp');
+let turf = require('turf');
 let glob = require('glob');
 let zip = require('express-easy-zip');
 let fs = require('fs');
-const {spawn} = require('child_process');
+let cargo = require('async/cargo');
 
 router.use(bodyParser.json()); // parse application/json
 router.use(bodyParser.urlencoded({extended: true})); // parse application/x-www-form-urlencoded
 router.use(zip());
 
 
-// TODO(tofull) jobs should be stacked in working queue (see async.js -> cargo module)
-// TODO(tofull) There is no need to use gdal rasterize, gdal translate, and pycocotools + pycococreator because we already have the polygon thanks to the mask
-
 let categoryCounter = {};
-let executableExtension = '';
-let isWin = process.platform === 'win32';
-if (isWin) {
-  executableExtension = '.exe';
-}
+
+// TODO(tofull) jobs should be stacked in working queue (see async.js -> cargo module)
+let processSplitCargo = cargo(function(tasks, callback) {
+  for (let i = 0; i < tasks.length; i++) {
+    processSplit(tasks[i].imageName, tasks[i].req, tasks[i].res);
+  }
+  callback();
+}, 10);
+
+
 /**
  * Reset the categoryCounter variable to default
  *
@@ -57,159 +59,12 @@ function updateCategoryCounter(imageBasename, category) {
 }
 
 
-router.get('/reset', function(req, res, next) {
-  resetCategoryCounter();
-  res.send('Reset each categorie count for all images');
-});
-
-
-router.get('/reset/:image_name', function(req, res) {
-  let imageName = req.params.image_name;
-  let imageBasename = imageName.replace(/\.[^/.]+$/, '');
-
-  resetCategoryCounter(imageBasename);
-  res.send(`Reset each categorie count for image ${imageBasename}`);
-});
-
-
 router.get('/spliter/:image_name', (req, res) => {
   req.app.app_data.processing_masks_status = {
-    available: false, message: 'server splitting polygons (step 1/4)'}; // Avoid multiple calls during processing coco format generator
+    available: false, message: 'server splitting polygons (step 1/2)'}; // Avoid multiple calls during processing coco format generator
   let imageName = req.params.image_name;
-  let mask = `public/data/masks/${imageName}.json`;
-  let imageBasename = imageName.replace(/\.[^/.]+$/, '');
 
-  let c = 0;
-
-  resetCategoryCounter(imageBasename);
-  fs.readFile(mask, 'utf8', function(err, data) {
-    if (err) {
-      return res.status(404).send('no data');
-    };
-    let dataArray = JSON.parse(data);
-    if (dataArray.length > 0) {
-      dataArray.forEach(function(item) {
-        let category = item.properties.category;
-        let index = updateCategoryCounter(imageBasename, category);
-        let filename = `${imageBasename}_${category}_${index}`;
-        let path = `public/data/process/masks/geojson/${filename}.geojson`;
-        fs.writeFile(path, JSON.stringify(item), function(err) {
-          c++;
-          if (err) throw err;
-          if (c == dataArray.length) {
-            return res.send('respond with a resource');
-          }
-        });
-      });
-    } else {
-      return res.status(404).send('Image data not found');
-    }
-  });
-});
-
-
-router.get('/maskconverter/tif/:image_name', (req, res) => {
-  req.app.app_data.processing_masks_status = {
-    available: false, message: 'server generating tif (step 2/4)'}; // Avoid multiple calls during processing coco format generator
-  let imageName = req.params.image_name;
-  let imageBasename = imageName.replace(/\.[^/.]+$/, '');
-  let imagePath = `public/data/images/${imageName}`;
-
-  glob(`public/data/process/masks/geojson/${imageBasename}*.geojson`, function(er, files) {
-    if (files.length == 0) {
-      return res.status(404).send('Corresponding data not found');
-    }
-    let c = 0;
-    // get size of the image
-    // TODO(tofull) if sharp could do this, doesn't use Jimp and sharp
-    new Jimp(imagePath, function(err, image) {
-      let w = image.bitmap.width; // the width of the image
-      let h = image.bitmap.height; // the height of the image
-
-      // get all masks geojson to transform
-      files.forEach(function(file) {
-        let fileBasename = file.replace(/.*\//, '') // Remove all the thing before the last slash (server url & api)
-          .replace(/\.[^/.]+$/, ''); // Remove all the thing after the last . (extension)
-
-        let outputFile = `public/data/process/masks/tif/${fileBasename}.tif`;
-        // call gdal
-        // eslint-disable-next-line max-len
-        let gdalCommand = `gdal_rasterize${executableExtension} -burn 255 -burn 255 -burn 255 -ts ${w} ${h} -te 0 0 ${w} ${h} "${file}" "${outputFile}"`;
-        let gdal = spawn(gdalCommand, [], {shell: true});
-
-        // gdal.stderr.on('data', (data) => {
-        //   console.log(`gdal stderr: ${data}`);
-        // });
-        gdal.on('close', function(code) {
-          c++;
-          if (c == files.length) {
-            return res.send('respond with a resource');
-          }
-        });
-      });
-    });
-  });
-});
-
-
-router.get('/maskconverter/png/:image_name', (req, res) => {
-  req.app.app_data.processing_masks_status = {
-    available: false, message: 'server generating png (step 3/4)'}; // Avoid multiple calls during processing coco format generator
-  let imageName = req.params.image_name;
-  let imageBasename = imageName.replace(/\.[^/.]+$/, '');
-  let c = 0;
-
-
-  // get all masks geojson to transform
-  glob(`public/data/process/masks/tif/${imageBasename}*.tif`, function(er, files) {
-    if (files.length == 0) {
-      return res.status(404).send('Corresponding data not found');
-    }
-    files.forEach(function(file) {
-      let fileBasename = file.replace(/.*\//, '') // Remove all the thing before the last slash (server url & api)
-        .replace(/\.[^/.]+$/, ''); // Remove all the thing after the last . (extension)
-
-      let outputFileCorrect = `public/data/process/masks/png/${fileBasename}.png`;
-      let outputFileTemp = `public/data/process/masks/png/${fileBasename}_toflip.png`;
-      // call gdal
-      // eslint-disable-next-line max-len
-      let gdalCommand = `gdal_translate${executableExtension} -of PNG  "${file}" "${outputFileTemp}"`;
-      let gdal = spawn(gdalCommand, [], {shell: true});
-      gdal.on('close', function(code) {
-        sharp(outputFileTemp).flip().toFile(outputFileCorrect, function(err) {
-          fs.unlink(outputFileTemp, function(error) {
-            if (error) {
-              throw error;
-            }
-            c++;
-            if (c == files.length) {
-              return res.send('respond with a resource');
-            }
-          });
-        });
-      });
-    });
-  });
-});
-
-
-router.get('/generate_coco_format', (req, res) => {
-  req.app.app_data.processing_masks_status = {
-    available: false, message: 'server generating masks (step 4/4)'}; // Avoid multiple calls during processing coco format generator
-  // TODO(tofull) move python script from data folder
-  let cococreatorCommand = `cd public/data/ && python3 shapes_to_coco.py`;
-  let cococreator = spawn(cococreatorCommand, [], {shell: true});
-  cococreator.stdout.on('data', (data) => {
-    console.log(`cococreator stdout: ${data}`);
-  });
-  cococreator.stderr.on('data', (data) => {
-    console.log(`cococreator stderr: ${data}`);
-  });
-  cococreator.on('close', function(code) {
-    req.app.app_data.processing_masks_status = {available: true, message: 'server ready'}; // Avoid multiple calls during processing coco format generator
-
-    res.send('json coco format generated');
-  });
+  processSplitCargo.push({imageName: imageName, req: req, res: res});
 });
 
 
@@ -276,4 +131,155 @@ router.get('/masks_by_categories', function(req, res, next) {
 });
 
 
+/**
+ * Generate one geojson file per manual annotation, for a given image
+ * Return a response when finishes
+ *
+ * @param {string} imageName the name of the image to split
+ * @param {Request} req request object
+ * @param {Response} res response object
+ */
+function processSplit(imageName, req, res) {
+  let mask = `public/data/masks/${imageName}.json`;
+  let imageBasename = imageName.replace(/\.[^/.]+$/, '');
+  let c = 0;
+  resetCategoryCounter(imageBasename);
+  fs.readFile(mask, 'utf8', function(err, data) {
+    if (err) {
+      return res.status(404).send('no data');
+    };
+    let dataArray = JSON.parse(data);
+    if (dataArray.length > 0) {
+      dataArray.forEach(function(item) {
+        let category = item.properties.category;
+        let index = updateCategoryCounter(imageBasename, category);
+        let filename = `${imageBasename}_${category}_${index}`;
+        let path = `public/data/process/masks/geojson/${filename}.geojson`;
+        fs.writeFile(path, JSON.stringify(item), function(err) {
+          c++;
+          if (err) {
+            throw err;
+          }
+          if (c == dataArray.length) {
+            return res.send('respond with a resource');
+          }
+        });
+      });
+    } else {
+      return res.status(404).send('Image data not found');
+    }
+  });
+}
+
+
+router.get('/generateCoco', function(req, res, next) {
+  req.app.app_data.processing_masks_status = {
+    available: false, message: 'server generating coco format (step 2/2)',
+  }; // Avoid multiple calls during processing coco format generator
+
+  // TODO(tofull) info and licenceList should be outside the code (in a config file for instance)
+  const info = {
+    'description': 'Jakarto Dataset',
+    'url': 'https://www.jakarto.com',
+    'version': '0.0.1',
+    'year': new Date().getFullYear(),
+    'contributor': 'Loic Messal (tofull)',
+    'date_created': new Date().toISOString(),
+  };
+
+  const licenceList = [
+    {
+      'id': 1,
+      'name': `Licence Creative Commons Attribution - Pas d'Utilisation Commerciale \
+- Partage dans les Mêmes Conditions 4.0 International`,
+      'url': 'http://creativecommons.org/licenses/by-nc-sa/4.0/',
+    },
+  ];
+
+  fs.readFile('public/data/annotation_list.json', 'utf8', function(err, data) {
+    let categories = JSON.parse(data);
+    let imageList = [];
+    glob(`public/data/images/*.jpg`, function(er, files) {
+      files.forEach((file, index)=>{
+          fs.stat(file, function(err, stats) {
+            let fileBasename = file.replace(/.*\//, ''); // Remove all the thing before the last slash (server url & api)
+            sharp(file).metadata().then(function(metadata) {
+              return {width: metadata.width, height: metadata.height};
+            }).then((size)=>{
+              let imageInfo = {
+                licence: 1,
+                file_name: fileBasename,
+                coco_url: '',
+                height: size.height,
+                width: size.width,
+                date_captured: stats.birthtime,
+                flickr_url: '',
+                id: index,
+              };
+              imageList.push(imageInfo);
+              if (imageList.length === files.length) {
+                glob(`public/data/process/masks/geojson/*.geojson`, function(err, geojsonFiles) {
+                  let segmentationList = [];
+
+                  geojsonFiles.forEach(function(geojsonFile, indexGeojsonFile) {
+                    fs.readFile(geojsonFile, 'utf8', function(err, geodata) {
+                      geodata = JSON.parse(geodata);
+                      let segmentation = geodata.geometry.coordinates;
+                      let category = geodata.properties.category;
+
+                      let categoryId = categories.filter((item) => item.name === category).map((item) => item.id)[0];
+
+                      let geojsonFileBaseImage = geojsonFile.replace(/.*\//, '').replace(/\_.*/, '') + '.jpg';
+
+                      let polygon = turf.polygon(segmentation);
+
+                      let bbox = turf.bbox(polygon);
+                      let [minX, minY, maxX, maxY] = bbox;
+
+                      // let area = turf.area(polygon);
+                      // TODO(tofull) turf.js returns area in m², considering x,y are latitude / longitude between -180°/180°... So used an estimation of the area as the surface of the bounding box (at least, polygon's area is less than this value)
+                      area = (maxX-minX) * (maxY - minY);
+
+                      let imageId = imageList.filter((item) => item.file_name === geojsonFileBaseImage)
+                                             .map((item) => item.id)[0];
+                      let segmentationData = {
+                        segmentation: segmentation,
+                        area: area,
+                        iscrowd: 0,
+                        image_id: imageId,
+                        bbox: bbox,
+                        category_id: categoryId,
+                        id: indexGeojsonFile,
+                      };
+                      segmentationList.push(segmentationData);
+
+                      if (segmentationList.length === geojsonFiles.length) {
+                        let cocoData = {
+                          'info': info,
+                          'licenses': licenceList,
+                          'categories': categories,
+                          'images': imageList,
+                          'annotations': segmentationList,
+                        };
+                        fs.writeFile('public/data/instances_shape_jakartotrain2018.json',
+                                      JSON.stringify(cocoData), function(err) {
+                          if (err) {
+                            throw err;
+                          }
+                          req.app.app_data.processing_masks_status = {
+                            available: true, message: 'server ready',
+                          }; // Avoid multiple calls during processing coco format generator
+                          res.send('coco generated');
+                        });
+                      }
+                    });
+                  });
+                });
+              }
+            });
+          });
+        });
+    });
+  });
+});
 module.exports = router;

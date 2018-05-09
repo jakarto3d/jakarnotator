@@ -7,6 +7,7 @@
     "dev": "gulp"
   },
   "dependencies": {
+    "async": "^2.6.0",
     "cookie-parser": "~1.4.3",
     "debug": "~2.6.9",
     "express": "~4.16.0",
@@ -14,14 +15,14 @@
     "express-prom-bundle": "^3.3.0",
     "glob": "^7.1.2",
     "http-errors": "~1.6.2",
-    "jimp": "^0.2.28",
     "melanke-watchjs": "^1.4.3",
     "morgan": "~1.9.0",
     "npm": "^5.8.0",
     "pug": "2.0.0-beta11",
     "redis": "^2.8.0",
     "sharp": "^0.20.1",
-    "socket.io": "^2.1.0"
+    "socket.io": "^2.1.0",
+    "turf": "^3.0.14"
   },
   "devDependencies": {
     "browser-sync": "^2.23.6",
