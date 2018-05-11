@@ -106,7 +106,7 @@
       }
     },
     {
-      "content": "<center><img src=\"http://github.com/jakarto3d/media/raw/master/logo_jakarto_fond_lidar.png\" alt=\"logo jakarto\" height=\"300px\"/></center>\n",
+      "content": "<center><a href=\"https://www.jakarto.com\" target=\"_blank\"><img src=\"http://github.com/jakarto3d/media/raw/master/logo_jakarto_fond_lidar.png\" alt=\"logo jakarto\" height=\"300px\"/></a></center>\n",
       "gridPos": {
         "h": 9,
         "w": 12,
