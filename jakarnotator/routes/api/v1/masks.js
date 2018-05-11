@@ -18,7 +18,7 @@ router.get('/:image_name', (req, res) => {
 
   fs.readFile(mask, 'utf8', function(err, data) {
     if (err) {
-      let emptyData = '{}';
+      let emptyData = '{}'; // TODO(tofull) maybe it should be '[]'
       // TODO(tofull) write file only if data/images/${image_name} exists
       fs.writeFile(mask, emptyData, function(err) {
         if (err) throw err;

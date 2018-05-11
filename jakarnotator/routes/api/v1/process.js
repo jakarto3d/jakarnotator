@@ -98,33 +98,40 @@ router.get('/download', function(req, res, next) {
 router.get('/masks_by_categories', function(req, res, next) {
   let output = {};
   let allFilesProcessed = 0;
-  glob(`public/data/masks/*.json`, function(er, files) {
-    files.forEach(function(file) {
-      fs.readFile(file, 'utf8', function(err, data) {
-        let dataArray = JSON.parse(data);
-        let allFeatureProcessed = 0;
-        if (dataArray.length > 0) {
-          dataArray.forEach(function(item) {
-            let category = item.properties.category;
-            if (output[category] === undefined) {
-              output[category] = 0;
-            } else {
-              output[category]++;
+  fs.readFile('public/data/annotation_list.json', 'utf8', function(err, data) {
+    let categories = JSON.parse(data);
+    for (let categoryItem of categories) {
+      output[categoryItem.name] = 0;
+    };
+    glob(`public/data/masks/*.json`, function(er, files) {
+      files.forEach(function(file, indexFile) {
+        fs.readFile(file, 'utf8', function(err, data) {
+          let dataArray = JSON.parse(data);
+          if (dataArray.length === undefined || dataArray.length === 0) {
+            if (dataArray.length === undefined) {
+              dataArray = [null];
             }
-            allFeatureProcessed++;
-            if (allFeatureProcessed == dataArray.length) {
+            if (dataArray.length === 0) {
+              dataArray = [null];
+            }
+          };
+          for (let [index, item] of dataArray.entries()) {
+            if (item) {
+              let category = item.properties.category;
+              if (output[category] === undefined) {
+                output[category] = 1; // should never occurs
+              } else {
+                output[category]++;
+              }
+            }
+            if (index == dataArray.length - 1 || dataArray.length == 0) {
               allFilesProcessed++;
             }
             if (allFilesProcessed == files.length) {
               res.send(JSON.stringify(output));
             }
-          });
-        } else {
-          allFilesProcessed++;
-          if (allFilesProcessed == files.length) {
-            res.send(JSON.stringify(output));
-          }
-        }
+          };
+        });
       });
     });
   });
@@ -141,7 +148,7 @@ router.get('/masks_by_categories', function(req, res, next) {
  */
 function processSplit(imageName, req, res) {
   let mask = `public/data/masks/${imageName}.json`;
-  let imageBasename = imageName.replace(/\.[^/.]+$/, '');
+  let imageBasename = imageName.replace(/;\.[^/.]+$/, '');
   let c = 0;
   resetCategoryCounter(imageBasename);
   fs.readFile(mask, 'utf8', function(err, data) {
@@ -202,7 +209,7 @@ router.get('/generateCoco', function(req, res, next) {
     glob(`public/data/images/*.jpg`, function(er, files) {
       files.forEach((file, index)=>{
           fs.stat(file, function(err, stats) {
-            let fileBasename = file.replace(/.*\//, ''); // Remove all the thing before the last slash (server url & api)
+            let fileBasename = file.replace(/;.*\//, ''); // Remove all the thing before the last slash (server url & api)
             sharp(file).metadata().then(function(metadata) {
               return {width: metadata.width, height: metadata.height};
             }).then((size)=>{
@@ -229,7 +236,7 @@ router.get('/generateCoco', function(req, res, next) {
 
                       let categoryId = categories.filter((item) => item.name === category).map((item) => item.id)[0];
 
-                      let geojsonFileBaseImage = geojsonFile.replace(/.*\//, '').replace(/\_.*/, '') + '.jpg';
+                      let geojsonFileBaseImage = geojsonFile.replace(/;.*\//, '').replace(/;\_.*/, '') + '.jpg';
 
                       let polygon = turf.polygon(segmentation);
 
