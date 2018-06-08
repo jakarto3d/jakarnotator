@@ -210,6 +210,7 @@ router.get('/generateCoco', function(req, res, next) {
       files.forEach((file, index)=>{
           fs.stat(file, function(err, stats) {
             let fileBasename = file.replace(/;.*\//, ''); // Remove all the thing before the last slash (server url & api)
+            fileBasename = fileBasename.replace(/public\/data\//, ''); // Remove the internal location of the images
             sharp(file).metadata().then(function(metadata) {
               return {width: metadata.width, height: metadata.height};
             }).then((size)=>{
