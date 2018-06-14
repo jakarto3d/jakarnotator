@@ -1,6 +1,6 @@
 (function() {
-    window.localStorage.clear();
-    window.sessionStorage.clear();
+    // window.localStorage.clear();
+    // window.sessionStorage.clear();
 
     let indexImage;
     let width;
@@ -520,6 +520,11 @@
         if (indexImage < 0) {
             indexImage = imagesList.length - 1;
         }
+        searchbar.change_image(searchbar.options.find((item) => item.label === imagesList[indexImage]));
+    });
+
+    document.getElementById('random').addEventListener('click', function(e) {
+        indexImage = Math.floor(Math.random() * imagesList.length);
         searchbar.change_image(searchbar.options.find((item) => item.label === imagesList[indexImage]));
     });
 
