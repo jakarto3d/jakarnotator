@@ -235,6 +235,8 @@
         // ESC
         if (event.keyCode === 27) {
             if (map.editTools._drawingEditor) map.editTools.stopDrawing();
+            window.sessionStorage.removeItem('editing_polygon');
+            editingLayer = undefined;
             map.editTools.featuresLayer.getLayers().forEach(function(l) {
                 if (l instanceof L.LayerGroup) {
                     l.getLayers().forEach(function(layer) {
