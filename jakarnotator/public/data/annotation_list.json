@@ -62,22 +62,22 @@
     {
         "supercategory": "outdoor",
         "id": 13,
-        "name": "traffic light"
+        "name": "traffic-light"
     },
     {
         "supercategory": "outdoor",
         "id": 14,
-        "name": "fire hydrant"
+        "name": "fire-hydrant"
     },
     {
         "supercategory": "outdoor",
         "id": 15,
-        "name": "stop sign"
+        "name": "stop-sign"
     },
     {
         "supercategory": "outdoor",
         "id": 16,
-        "name": "parking meter"
+        "name": "parking-meter"
     },
     {
         "supercategory": "outdoor",
@@ -152,12 +152,12 @@
     {
         "supercategory": "civil",
         "id": 31,
-        "name": "street ligths"
+        "name": "street-ligths"
     },
     {
         "supercategory": "civil",
         "id": 32,
-        "name": "pedestrian crossing"
+        "name": "pedestrian-crossing"
     },
     {
         "id": 33,
