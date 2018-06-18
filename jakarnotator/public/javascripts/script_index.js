@@ -418,8 +418,6 @@
                 if (window.sessionStorage.getItem('editing_polygon')) {
                     let geojsonFeature = JSON.parse(window.sessionStorage.getItem('editing_polygon'));
                     console.log('reloading current editing polygon');
-                    console.log(geojsonFeature);
-                    console.log(`DONTSAVE : ${DONTSAVE}`);
                     L.geoJSON(geojsonFeature).addTo(map.editTools.featuresLayer).getLayers().forEach(function(l) {
                         DONTSAVE=true;
                         l.enableEdit();
