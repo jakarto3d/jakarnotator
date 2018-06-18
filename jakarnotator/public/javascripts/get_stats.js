@@ -10,6 +10,7 @@
             currentPage: 1,
             perPage: 5,
             totalRows: 0,
+            totalImages: null,
             pageOptions: [5, 10, 15, 25, 50, 100],
             sortBy: 'number_masks',
             sortDesc: true,
@@ -22,6 +23,7 @@
             .then((response) => response.json())
             .then((listImageJson) => JSON.parse(listImageJson))
             .then((listImages) => {
+                this.totalImages = listImages.length;
                 listImages.map((imageName, index) => {
                     fetch(`/api/v1/masks/stats/${imageName}`, {method: 'GET'})
                     .then((response) => response.json())
