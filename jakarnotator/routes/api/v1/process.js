@@ -237,19 +237,22 @@ router.get('/generateCoco', function(req, res, next) {
 
                       let categoryId = categories.filter((item) => item.name === category).map((item) => item.id)[0];
 
-                      let geojsonFileBaseImage = geojsonFile.replace(/;.*\//, '').replace(/;\_.*/, '') + '.jpg';
-
+                      
                       let polygon = turf.polygon(segmentation);
-
+                      
                       let bbox = turf.bbox(polygon);
                       let [minX, minY, maxX, maxY] = bbox;
-
+                      
                       // let area = turf.area(polygon);
                       // TODO(tofull) turf.js returns area in m², considering x,y are latitude / longitude between -180°/180°... So used an estimation of the area as the surface of the bounding box (at least, polygon's area is less than this value)
                       area = (maxX-minX) * (maxY - minY);
+                      
+                      // TODO(tofull) does not hardcode 'images/'
+                      let geojsonFileBaseImage = 'images/' + geojsonFile.replace(/.*\//, '').replace(/\_.*/, '');
 
                       let imageId = imageList.filter((item) => item.file_name === geojsonFileBaseImage)
                                              .map((item) => item.id)[0];
+
                       let segmentationData = {
                         segmentation: segmentation,
                         area: area,
