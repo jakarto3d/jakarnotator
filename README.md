@@ -2,10 +2,7 @@
 
 Jakarnotator is an annotation tool to create your own database for instance segmentation problem. Jakarnotator data are compatible with the format of Coco database.
 
-<div align="center">
-  <img src="doc/jakarnotator_example1.png" width="700px" />
-  <p>Example of annoted objects in an image.</p>
-</div>
+![example](doc/jakarnotator_example1.png)
 
 At [Jakarto](http://www.jakarto.com), we used Jakarnotator a database of urban furnitures. With these data we train our models with Detectron algorithm (no modification needed to deal with input data format).
 
