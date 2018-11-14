@@ -1,30 +1,21 @@
-Live démo : [http://jakarnotator.jakarto.com](http://jakarnotator.jakarto.com)
+# Jakarnotator
 
-Need redis server on.
-Grafana and Prometheus are also required.
+Jakarnotator is an annotation tool to create your own database for instance segmentation problem. Jakarnotator data are compatible with the format of Coco database.
 
-```
-cd jakarnotator
-npm install
+<div align="center">
+  <img src="doc/jakarnotator_example1.png" width="700px" />
+  <p>Example of annoted objects in an image.</p>
+</div>
 
-# for DEV :s
-# On bash terminal:
-DEBUG=jakarnotator:* npm run dev
-# On powershell:
-$env:DEBUG='jakarnotator:*'; npm run dev
+At [Jakarto](http://www.jakarto.com), we used Jakarnotator a database of urban furnitures. With these data we train our models with Detectron algorithm (no modification needed to deal with input data format).
 
-# for PROD :
-# On bash terminal:
-PORT=80 DEBUG=jakarnotator:* npm start
-# On powershell:
-$env:PORT='80';$env:DEBUG='jakarnotator:*'; npm start
-```
+# Links
+To see the Jakarnotator in action please take a look to these two links :
+- [Youtube introduction to Jakarnotator](https://www.youtube.com/watch?v=fihxrLv6EIU&t=966s)
+- [Live demo](http://jakarnotator.jakarto.com)
 
-# with docker
-```
-# Development
-docker-compose -p dev -f docker-compose.dev.yml up --build --force-recreate
+# Usage
+Click [here](USAGE.md) if you want to learn how to annotate objects in the Jakarnotator
 
-# Production
-JAKARNOTATOR_PORT_MAPPED=80 docker-compose -p prod -f docker-compose.yml up --build --force-recreate
-```
+# Getting started
+If you are even more interested in creating your own images or create new classes of objects you should take a look to this [GETTING_STARTED.md](GETTING_STARTED.md)
