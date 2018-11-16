@@ -1,7 +1,12 @@
 # Installation
+
 ## With Docker (recommended)
-```
+
+```sh
 # Development
+# With the docker-compose.dev.yml, the code source is mapped inside the container. 
+# We plan to add a live reload to ease the development.
+
 docker-compose -p dev -f docker-compose.dev.yml up --build --force-recreate
 
 # Production
@@ -9,14 +14,15 @@ JAKARNOTATOR_PORT_MAPPED=80 docker-compose -p prod -f docker-compose.yml up --bu
 ```
 
 ## On your machine
-You need to have your redis server on.
+
+Jakarnotator uses a Redis database for cache. You need to have your redis server on.
 Grafana and Prometheus are also required.
 
 ```
 cd jakarnotator
 npm install
 
-# for DEV :s
+# for DEV :
 # On bash terminal:
 DEBUG=jakarnotator:* npm run dev
 # On powershell:
@@ -40,7 +46,7 @@ The element (2) represents the supercategory to which the class (3) is associate
 
 To create your own supercategory or class you need to modify the file [annotation_list.json](jakarnotator/public/data/annotation_list.json)
 ```
-The hierarchy tree is based on Coco's :
+The hierarchy tree is inherited from Shape category:
 Shape
     |___ Civil
     |___ Utility
